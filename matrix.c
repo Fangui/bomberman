@@ -45,7 +45,7 @@ void printMat(struct matrix *mat)
   for(size_t i = 0; i < mat->lines; ++i)
   {
     printf("|");
-    for(size_t j = 0; j < mat->cols; j++)
+    for(size_t j = 0; j < mat->cols; ++j)
     {
       if(mat->data[i * mat->cols + j] == 42)
         printf("p");
