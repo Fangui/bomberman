@@ -1,6 +1,7 @@
 # include "matrix.h"
 
 # include <termios.h>
+# include <unistd.h>
 
 void game(size_t lines, size_t cols)
 {
@@ -24,7 +25,8 @@ void game(size_t lines, size_t cols)
     {
       if(posY + 1 < mat->lines && mat->data[(posY + 1) * mat->cols + posX]==0)
       {
-        mat->data[posY * mat->cols + posX] = 0;
+        if(mat->data[posY * mat->cols + posX] == 42)
+          mat->data[posY * mat->cols + posX] = 0;
         ++posY;
         mat->data[posY * mat->cols + posX] = 42;
       }
@@ -33,7 +35,8 @@ void game(size_t lines, size_t cols)
     {
       if(posY != 0 && mat->data[(posY - 1) * mat->cols + posX] == 0)
       {
-        mat->data[posY * mat->cols + posX] = 0;
+        if(mat->data[posY * mat->cols + posX] == 42)
+          mat->data[posY * mat->cols + posX] = 0;
         --posY;
         mat->data[posY * mat->cols + posX] = 42;
       }
@@ -42,7 +45,8 @@ void game(size_t lines, size_t cols)
     {
       if(posX + 1 < mat->cols && mat->data[posY * mat->cols + posX + 1] == 0)
       {
-        mat->data[posY * mat->cols + posX] = 0;
+        if(mat->data[posY * mat->cols + posX] == 42)
+          mat->data[posY * mat->cols + posX] = 0;
         ++posX;
         mat->data[posY * mat->cols + posX] = 42;
       }
@@ -51,13 +55,19 @@ void game(size_t lines, size_t cols)
     {
       if(posX != 0 && mat->data[posY * mat->cols + posX - 1] == 0)
       {
-        mat->data[posY * mat->cols + posX] = 0;
+        if(mat->data[posY * mat->cols + posX] == 42)
+          mat->data[posY * mat->cols + posX] = 0;
         --posX;
         mat->data[posY * mat->cols + posX] = 42;
       }
     }
+    else if(c == ' ')
+    {
+      if(mat->data[posY * mat->cols + posX] != 27)
+        mat->data[posY * mat->cols + posX] = 27;
+    }
     else
-      isAlive = 0; 
+      isAlive = 0;
     printf("\e[1;1H\e[2J");
   }
   freeMat(mat);

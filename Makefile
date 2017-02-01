@@ -15,3 +15,4 @@ clean:
 	rm -f ${OBJ}
 	rm -f *.o
 	rm bomber
+	clear
