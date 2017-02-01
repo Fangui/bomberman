@@ -20,5 +20,5 @@ void freeMat(struct matrix *mat);
 
 void printMat(struct matrix *mat);
 
-
+void buildMap(struct matrix *mat);
 # endif

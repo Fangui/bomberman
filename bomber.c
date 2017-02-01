@@ -3,12 +3,9 @@
 
 void game(size_t lines, size_t cols)
 {
-  
+//  int isAlive = 1;  
   struct matrix *mat = newMat(lines, cols);
-  srand(time(NULL));
-  for(size_t i = 0; i < mat->lines; ++i)
-    for(size_t j = 0; j < mat->cols; ++j)
-      mat->data[i * mat->cols + j] = rand() % 8;
+  buildMap(mat);
 
   printMat(mat);
   freeMat(mat);
@@ -17,9 +14,9 @@ void game(size_t lines, size_t cols)
 
 int main()
 {
-  size_t lines;
-  printf("lines & cols ? : ");
-  scanf("%zu", &lines);
+  size_t lines = 9;
+//  printf("lines & cols ? : ");
+//  scanf("%zu", &lines);
   game(lines, lines);
   return 0;
 }
