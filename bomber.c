@@ -7,36 +7,42 @@
 
 void kboom(struct matrix *mat, size_t lines, size_t cols, int field)
 {
-  int x = (int)lines;
-  int y = (int)cols;
+  int x = (int)cols;
+  int y = (int)lines;
   int left = field;
   int right = field;
   int up = field;
   int down = field;
+
   mat->data[lines * mat->cols + cols] = _KBOOM;
 
-  for (int i = x; i >= 0 && left >= 0; --i, --left)
+  for (int i = x; i >= 0 && left >= 0 && mat->data[lines * mat->cols + i] != _WALLU; --i, --left)
   {
-    if (mat->data[i * mat->cols + cols] == _WALLE)
-    { mat->data[i * mat->cols + cols] = _KBOOM; }
+    if (mat->data[lines * mat->cols + i] == _WALLE)
+      left = 0;
+    mat->data[lines * mat->cols + i] = _KBOOM;
   }
 
-  for (int j = y; j < mat->lines && up >= 0; ++j, --up)
+  for (int j = y; j >= 0 && up >= 0 && mat->data[j * mat->cols + cols] != _WALLU; --j, --up)
   {
-    if (mat->data[lines * mat->cols + j] == _WALLE)
-    { mat->data[lines * mat->cols + j] = _KBOOM; }
+    if (mat->data[j * mat->cols + cols] == _WALLE)
+      up = 0;
+    mat->data[j * mat->cols + cols] = _KBOOM;
   }
 
-  for (int i = x; i < mat->cols && right >= 0; ++i, --right)
+  for (int i = x; i < (int)mat->cols && right >= 0 && mat->data[lines * mat->cols + i] != _WALLU; ++i, --right)
   {
-    if (mat->data[i * mat->cols + cols] == _WALLE)
-    { mat->data[i * mat->cols + cols] = _KBOOM; }
+    if (mat->data[lines * mat->cols + i] == _WALLE)
+      right = 0;
+    mat->data[lines * mat->cols + i] = _KBOOM;
   }
 
-  for (int j = y; j >= 0 && down >= 0; --j, --down)
+  for (int j = y; j < (int)mat->lines && down >= 0 && mat->data[j * mat->cols + cols] != _WALLU; ++j, --down)
   {
-    if (mat->data[lines * mat->cols + j] == _WALLE)
-    { mat->data[lines * mat->cols + j] = _KBOOM; }
+    
+    if (mat->data[j * mat->cols + cols] == _WALLE)
+      down = 0;
+    mat->data[j * mat->cols + cols] = _KBOOM;
   }
 }
 
