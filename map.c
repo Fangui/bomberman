@@ -40,6 +40,9 @@ void buildMap(struct matrix *mat)
   *(mat -> data + 1) = _BGN;
   *(mat -> data + (1 * mat -> cols + 0)) = _BGN;
   *(mat -> data + (1 * mat -> cols + 1)) = _BGN;
+
+  *(mat -> data + (1 * mat -> cols + 2)) = _BGN;
+  *(mat -> data + (1 * mat -> cols + 3)) = _BGN;
 }
 
 void printMat(struct matrix *mat)
@@ -63,13 +66,16 @@ void printMat(struct matrix *mat)
           printf("B");
           break;
         case _PLAYER:
-         printf("P");
-         break;
+          printf("P");
+          break;
         case _WALLE:
           printf("\"");
           break;
         case _WALLU:
           printf("#");
+          break;
+        case _KBOOM:
+          printf("+");
           break;
         default:
           break;

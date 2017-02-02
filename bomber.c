@@ -7,7 +7,11 @@
 
 void kboom(struct matrix *mat, size_t lines, size_t cols)
 {
-  mat->data[lines * mat->cols + cols] = _BGN;
+  mat->data[lines * mat->cols + cols] = _KBOOM;
+  mat->data[(lines - 1) * mat->cols + cols] = _KBOOM;
+  mat->data[(lines + 1) * mat->cols + cols] = _KBOOM;
+  mat->data[lines * mat->cols + cols + 1] = _KBOOM;
+  mat->data[lines * mat->cols + cols - 1] = _KBOOM;
 }
 
 void game(size_t lines, size_t cols)

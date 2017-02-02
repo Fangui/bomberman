@@ -6,6 +6,7 @@
 # define _BGN 41
 # define _WALLU 13
 # define _WALLE 27
+# define _KBOOM 99
 
 # include <stdio.h>
 # include <stdlib.h>
