@@ -1,15 +1,24 @@
+# define _XOPEN_SOURCE 500
+
 # include "matrix.h"
 
 # include <termios.h>
 # include <unistd.h>
 
+void kboom(struct matrix *mat, size_t lines, size_t cols)
+{
+  mat->data[lines * mat->cols + cols] = 0;
+  
+}
 void game(size_t lines, size_t cols)
 {
-  int isAlive = 1;  
+  struct timespec start, end;
+    
+  int isAlive = 1, bomb = 0;
   struct matrix *mat = newMat(lines, cols);
   buildMap(mat);
 
-  size_t posX = 0, posY = 0;
+  size_t posX = 0, posY = 0, X = 0, Y = 0;
   struct termios info;
   tcgetattr(0, &info);
   info.c_lflag &= ~ICANON;
@@ -17,11 +26,24 @@ void game(size_t lines, size_t cols)
   info.c_cc[VTIME] = 0;
   tcsetattr(0, TCSANOW, &info);
 
+  
   while(isAlive)
   {
+    if(bomb)
+    {
+      clock_gettime(CLOCK_MONOTONIC, &start);
+      if(start.tv_sec >= end.tv_sec)
+      {
+        kboom(mat, Y, X);
+        bomb = 0;
+      }
+    }
+
+
     printMat(mat);
     char c = getchar();
-    if(c == 's') 
+
+    if(c == 's')
     {
       if(posY + 1 < mat->lines && mat->data[(posY + 1) * mat->cols + posX]==0)
       {
@@ -64,7 +86,14 @@ void game(size_t lines, size_t cols)
     else if(c == ' ')
     {
       if(mat->data[posY * mat->cols + posX] != 27)
+      {
+        X = posX;
+        Y = posY;
         mat->data[posY * mat->cols + posX] = 27;
+        bomb = 1;
+        clock_gettime(CLOCK_MONOTONIC, &end);
+        end.tv_sec += 3;
+      }
     }
     else
       isAlive = 0;
