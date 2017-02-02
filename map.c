@@ -1,4 +1,4 @@
-# include "matrix.h"
+# include "map.h"
 # include <time.h>
 
 struct matrix * newMat(size_t lines, size_t cols)

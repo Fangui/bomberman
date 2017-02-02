@@ -1,15 +1,15 @@
 # define _XOPEN_SOURCE 500
 
-# include "matrix.h"
+# include "map.h"
 
 # include <termios.h>
 # include <unistd.h>
 
 void kboom(struct matrix *mat, size_t lines, size_t cols)
 {
-  mat->data[lines * mat->cols + cols] = 0;
-  
+  mat->data[lines * mat->cols + cols] = _BGN;
 }
+
 void game(size_t lines, size_t cols)
 {
   struct timespec start, end;
