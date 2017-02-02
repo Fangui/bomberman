@@ -14,5 +14,6 @@ bomber: ${OBJ}
 clean:
 	rm -f ${OBJ}
 	rm -f *.o
+	rm -f .*.swp
 	rm bomber
 	clear

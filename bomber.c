@@ -5,13 +5,39 @@
 # include <termios.h>
 # include <unistd.h>
 
-void kboom(struct matrix *mat, size_t lines, size_t cols)
+void kboom(struct matrix *mat, size_t lines, size_t cols, int field)
 {
+  int x = (int)lines;
+  int y = (int)cols;
+  int left = field;
+  int right = field;
+  int up = field;
+  int down = field;
   mat->data[lines * mat->cols + cols] = _KBOOM;
-  mat->data[(lines - 1) * mat->cols + cols] = _KBOOM;
-  mat->data[(lines + 1) * mat->cols + cols] = _KBOOM;
-  mat->data[lines * mat->cols + cols + 1] = _KBOOM;
-  mat->data[lines * mat->cols + cols - 1] = _KBOOM;
+
+  for (int i = x; i >= 0 && left >= 0; --i, --left)
+  {
+    if (mat->data[i * mat->cols + cols] == _WALLE)
+    { mat->data[i * mat->cols + cols] = _KBOOM; }
+  }
+
+  for (int j = y; j < mat->lines && up >= 0; ++j, --up)
+  {
+    if (mat->data[lines * mat->cols + j] == _WALLE)
+    { mat->data[lines * mat->cols + j] = _KBOOM; }
+  }
+
+  for (int i = x; i < mat->cols && right >= 0; ++i, --right)
+  {
+    if (mat->data[i * mat->cols + cols] == _WALLE)
+    { mat->data[i * mat->cols + cols] = _KBOOM; }
+  }
+
+  for (int j = y; j >= 0 && down >= 0; --j, --down)
+  {
+    if (mat->data[lines * mat->cols + j] == _WALLE)
+    { mat->data[lines * mat->cols + j] = _KBOOM; }
+  }
 }
 
 void game(size_t lines, size_t cols)
@@ -38,7 +64,7 @@ void game(size_t lines, size_t cols)
       clock_gettime(CLOCK_MONOTONIC, &start);
       if(start.tv_sec >= end.tv_sec)
       {
-        kboom(mat, Y, X);
+        kboom(mat, Y, X, 2);
         bomb = 0;
       }
     }
@@ -89,7 +115,7 @@ void game(size_t lines, size_t cols)
     }
     else if(c == ' ')
     {
-      if(mat->data[posY * mat->cols + posX] != _BOMB)
+      if(mat->data[posY * mat->cols + posX] != _BOMB && bomb == 0)
       {
         X = posX;
         Y = posY;
@@ -98,7 +124,7 @@ void game(size_t lines, size_t cols)
         clock_gettime(CLOCK_MONOTONIC, &end);
         end.tv_sec += 3;
       }
-      if(mat->data[posY * mat->cols + posX] != _BOMB)
+      if(mat->data[posY * mat->cols + posX] != _BOMB && bomb == 0)
         mat->data[posY * mat->cols + posX] = _BOMB;
     }
     else
