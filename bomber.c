@@ -45,55 +45,57 @@ void game(size_t lines, size_t cols)
 
     if(c == 's')
     {
-      if(posY + 1 < mat->lines && mat->data[(posY + 1) * mat->cols + posX]==0)
+      if(posY + 1 < mat->lines && mat->data[(posY + 1) * mat->cols + posX] == _BGN)
       {
-        if(mat->data[posY * mat->cols + posX] == 42)
-          mat->data[posY * mat->cols + posX] = 0;
+        if(mat->data[posY * mat->cols + posX] == _PLAYER)
+          mat->data[posY * mat->cols + posX] = _BGN;
         ++posY;
-        mat->data[posY * mat->cols + posX] = 42;
+        mat->data[posY * mat->cols + posX] = _PLAYER;
       }
     }
     else if(c == 'z')
     {
-      if(posY != 0 && mat->data[(posY - 1) * mat->cols + posX] == 0)
+      if(posY != 0 && mat->data[(posY - 1) * mat->cols + posX] == _BGN)
       {
-        if(mat->data[posY * mat->cols + posX] == 42)
-          mat->data[posY * mat->cols + posX] = 0;
+        if(mat->data[posY * mat->cols + posX] == _PLAYER)
+          mat->data[posY * mat->cols + posX] = _BGN;
         --posY;
-        mat->data[posY * mat->cols + posX] = 42;
+        mat->data[posY * mat->cols + posX] = _PLAYER;
       }
     }
     else if(c == 'd')
     {
-      if(posX + 1 < mat->cols && mat->data[posY * mat->cols + posX + 1] == 0)
+      if(posX + 1 < mat->cols && mat->data[posY * mat->cols + posX + 1] == _BGN)
       {
-        if(mat->data[posY * mat->cols + posX] == 42)
-          mat->data[posY * mat->cols + posX] = 0;
+        if(mat->data[posY * mat->cols + posX] == _PLAYER)
+          mat->data[posY * mat->cols + posX] = _BGN;
         ++posX;
-        mat->data[posY * mat->cols + posX] = 42;
+        mat->data[posY * mat->cols + posX] = _PLAYER;
       }
     }
     else if(c == 'q')
     {
-      if(posX != 0 && mat->data[posY * mat->cols + posX - 1] == 0)
+      if(posX != 0 && mat->data[posY * mat->cols + posX - 1] == _BGN)
       {
-        if(mat->data[posY * mat->cols + posX] == 42)
-          mat->data[posY * mat->cols + posX] = 0;
+        if(mat->data[posY * mat->cols + posX] == _PLAYER)
+          mat->data[posY * mat->cols + posX] = _BGN;
         --posX;
-        mat->data[posY * mat->cols + posX] = 42;
+        mat->data[posY * mat->cols + posX] = _PLAYER;
       }
     }
     else if(c == ' ')
     {
-      if(mat->data[posY * mat->cols + posX] != 27)
+      if(mat->data[posY * mat->cols + posX] != _BOMB)
       {
         X = posX;
         Y = posY;
-        mat->data[posY * mat->cols + posX] = 27;
+        mat->data[posY * mat->cols + posX] = _BOMB;
         bomb = 1;
         clock_gettime(CLOCK_MONOTONIC, &end);
         end.tv_sec += 3;
       }
+      if(mat->data[posY * mat->cols + posX] != _BOMB)
+        mat->data[posY * mat->cols + posX] = _BOMB;
     }
     else
       isAlive = 0;
@@ -108,6 +110,7 @@ int main()
   size_t lines = 9;
 //  printf("lines & cols ? : ");
 //  scanf("%zu", &lines);
-  game(lines, lines);
+  game(lines, lines * 2);
+
   return 0;
 }

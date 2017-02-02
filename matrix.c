@@ -39,7 +39,7 @@ void buildMap(struct matrix *mat)
 void printMat(struct matrix *mat)
 {
   for(size_t i = 0; i < mat->cols + 2; ++i)
-    printf("_");
+    printf("--");
   printf("\n");
 
   for(size_t i = 0; i < mat->lines; ++i)
@@ -64,6 +64,6 @@ void printMat(struct matrix *mat)
     printf("|\n");
   }
   for(size_t i = 0; i < mat->cols + 2; ++i)
-    printf("-");
+    printf("--");
   printf("\n");
 }

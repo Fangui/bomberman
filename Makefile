@@ -4,7 +4,7 @@ CFLAGS= -Wall -Wextra -std=c99 -g -o bomber
 LDFLAGS=
 LDLIBS=
  
-SRC= matrix.c
+SRC= map.c #matrix.c
 
 OBJ= ${SRC:.c=.o} 
 all: bomber
