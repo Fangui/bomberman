@@ -19,11 +19,20 @@ void freeMat(struct matrix *mat)
 void buildMap(struct matrix *mat)
 {
   srand(time(NULL));
+  int n;
 
   for (size_t i = 0; i < mat -> lines; ++i)
   {
     for (size_t j = 0; j < mat -> cols; ++j)
-    { *(mat -> data + (i * mat -> cols + j)) = rand() % 42; }
+    {
+      n = rand() % 42;
+      if (n <= 13)
+      { *(mat -> data + (i * mat -> cols + j)) = _WALLU; }
+      else if (n <= 27)
+      { *(mat -> data + (i * mat -> cols + j)) = _WALLE; }
+      else
+      { *(mat -> data + (i * mat -> cols + j)) = _BGN; }
+    }
   }
 
   // Around the player to begin
@@ -45,14 +54,26 @@ void printMat(struct matrix *mat)
     for (size_t j = 0; j < mat -> cols; ++j)
     {
       int n = *(mat -> data + (i * mat -> cols + j));
-      if (n == _PLAYER)
-      { printf("P"); }
-      else if (n == _BOMB)
-      { printf("B"); }
-      else if (0 <= n && n <= 13)
-      { printf("#"); }
-      else
-      { printf(" "); }
+      switch (n)
+      {
+        case _BGN:
+          printf(" ");
+          break;
+        case _BOMB:
+          printf("B");
+          break;
+        case _PLAYER:
+         printf("P");
+         break;
+        case _WALLE:
+          printf("\"");
+          break;
+        case _WALLU:
+          printf("#");
+          break;
+        default:
+          break;
+      }
     }
     printf("|");
   }

@@ -1,8 +1,11 @@
 # ifndef MATRIX_H_
 # define MATRIX_H_
+
 # define _BOMB 666
 # define _PLAYER 42
 # define _BGN 41
+# define _WALLU 13
+# define _WALLE 27
 
 # include <stdio.h>
 # include <stdlib.h>

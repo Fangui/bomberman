@@ -43,7 +43,7 @@ void game(size_t lines, size_t cols)
     printMat(mat);
     char c = getchar();
 
-    if(c == 's')
+    if(c == 's' || c == '2')
     {
       if(posY + 1 < mat->lines && mat->data[(posY + 1) * mat->cols + posX] == _BGN)
       {
@@ -53,7 +53,7 @@ void game(size_t lines, size_t cols)
         mat->data[posY * mat->cols + posX] = _PLAYER;
       }
     }
-    else if(c == 'z')
+    else if(c == 'z' || c == '8')
     {
       if(posY != 0 && mat->data[(posY - 1) * mat->cols + posX] == _BGN)
       {
@@ -63,7 +63,7 @@ void game(size_t lines, size_t cols)
         mat->data[posY * mat->cols + posX] = _PLAYER;
       }
     }
-    else if(c == 'd')
+    else if(c == 'd' || c == '6')
     {
       if(posX + 1 < mat->cols && mat->data[posY * mat->cols + posX + 1] == _BGN)
       {
@@ -73,7 +73,7 @@ void game(size_t lines, size_t cols)
         mat->data[posY * mat->cols + posX] = _PLAYER;
       }
     }
-    else if(c == 'q')
+    else if(c == 'q' || c == '4')
     {
       if(posX != 0 && mat->data[posY * mat->cols + posX - 1] == _BGN)
       {
@@ -107,7 +107,7 @@ void game(size_t lines, size_t cols)
 
 int main()
 {
-  size_t lines = 9;
+  size_t lines = 13;
 //  printf("lines & cols ? : ");
 //  scanf("%zu", &lines);
   game(lines, lines * 2);
