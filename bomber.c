@@ -5,7 +5,17 @@
 # include <termios.h>
 # include <unistd.h>
 
-void kboom(struct matrix *mat, size_t lines, size_t cols, int field)
+void end_Bomb(struct matrix *mat, int lines, int cols)
+{
+  mat->data[lines * mat->cols + cols] = _BGN;
+
+  for(int i = lines - 1; i >= 0 && mat->data[lines * mat->cols + i] == _KBOOM; --i)
+    mat->data[lines * mat->cols + i] = _BGN;
+  for(int j = cols - 1; j >= 0 && mat->data[lines * mat->cols + j] == _KBOOM; --j)
+    mat->data[lines * mat->cols + cols] = _BGN;
+
+}
+int kboom(struct matrix *mat, size_t lines, size_t cols, int field)
 {
   int x = (int)cols;
   int y = (int)lines;
@@ -13,37 +23,53 @@ void kboom(struct matrix *mat, size_t lines, size_t cols, int field)
   int right = field;
   int up = field;
   int down = field;
+  int isAlive = 1;
 
   mat->data[lines * mat->cols + cols] = _KBOOM;
 
-  for (int i = x; i >= 0 && left >= 0 && mat->data[lines * mat->cols + i] != _WALLU; --i, --left)
+  for (int i = x - 1; i >= 0 && left >= 0 && mat->data[lines * mat->cols + i] != _WALLU; --i, --left)
   {
     if (mat->data[lines * mat->cols + i] == _WALLE)
       left = 0;
+    else if(mat->data[lines * mat->cols + i] == _PLAYER)
+     isAlive = 0;
     mat->data[lines * mat->cols + i] = _KBOOM;
   }
 
-  for (int j = y; j >= 0 && up >= 0 && mat->data[j * mat->cols + cols] != _WALLU; --j, --up)
+  for (int j = y - 1; j >= 0 && up >= 0 && mat->data[j * mat->cols + cols] != _WALLU; --j, --up)
   {
     if (mat->data[j * mat->cols + cols] == _WALLE)
       up = 0;
+    else if(mat->data[j * mat->cols + cols] == _PLAYER)
+     isAlive = 0;
+     
     mat->data[j * mat->cols + cols] = _KBOOM;
   }
 
-  for (int i = x; i < (int)mat->cols && right >= 0 && mat->data[lines * mat->cols + i] != _WALLU; ++i, --right)
+  for (int i = x + 1; i < (int)mat->cols && right >= 0 && mat->data[lines * mat->cols + i] != _WALLU; ++i, --right)
   {
     if (mat->data[lines * mat->cols + i] == _WALLE)
       right = 0;
+    else if(mat->data[lines * mat->cols + i] == _PLAYER)
+     isAlive = 0;
+ 
     mat->data[lines * mat->cols + i] = _KBOOM;
   }
 
-  for (int j = y; j < (int)mat->lines && down >= 0 && mat->data[j * mat->cols + cols] != _WALLU; ++j, --down)
+  for (int j = y + 1; j < (int)mat->lines && down >= 0 && mat->data[j * mat->cols + cols] != _WALLU; ++j, --down)
   {
     
     if (mat->data[j * mat->cols + cols] == _WALLE)
       down = 0;
+    else if(mat->data[j * mat->cols + cols] == _PLAYER)
+      isAlive = 0; 
     mat->data[j * mat->cols + cols] = _KBOOM;
   }
+  if(!isAlive)
+    return 0;
+
+  end_Bomb(mat, x, y);
+  return 1;
 }
 
 void game(size_t lines, size_t cols)
@@ -61,7 +87,6 @@ void game(size_t lines, size_t cols)
   info.c_cc[VMIN] = 1;
   info.c_cc[VTIME] = 0;
   tcsetattr(0, TCSANOW, &info);
-
   
   while(isAlive)
   {
@@ -70,11 +95,10 @@ void game(size_t lines, size_t cols)
       clock_gettime(CLOCK_MONOTONIC, &start);
       if(start.tv_sec >= end.tv_sec)
       {
-        kboom(mat, Y, X, 2);
+        isAlive = kboom(mat, Y, X, 2);
         bomb = 0;
       }
     }
-
 
     printMat(mat);
     char c = getchar();
@@ -130,11 +154,7 @@ void game(size_t lines, size_t cols)
         clock_gettime(CLOCK_MONOTONIC, &end);
         end.tv_sec += 3;
       }
-      if(mat->data[posY * mat->cols + posX] != _BOMB && bomb == 0)
-        mat->data[posY * mat->cols + posX] = _BOMB;
     }
-    else
-      isAlive = 0;
     printf("\e[1;1H\e[2J");
   }
   freeMat(mat);
