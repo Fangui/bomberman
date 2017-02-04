@@ -9,12 +9,16 @@ void end_Bomb(struct matrix *mat, int lines, int cols)
 {
   mat->data[lines * mat->cols + cols] = _BGN;
 
-  for(int i = lines - 1; i >= 0 && mat->data[lines * mat->cols + i] == _KBOOM; --i)
-    mat->data[lines * mat->cols + i] = _BGN;
+  for(int i = lines - 1; i >= 0 && mat->data[i * mat->cols + cols] == _KBOOM; --i)
+    mat->data[i * mat->cols + cols] = _BGN;
   for(int j = cols - 1; j >= 0 && mat->data[lines * mat->cols + j] == _KBOOM; --j)
-    mat->data[lines * mat->cols + cols] = _BGN;
-
+    mat->data[lines * mat->cols + j] = _BGN;
+  for(int i = lines + 1; i < (int) mat->lines && mat->data[i * mat->cols + cols] == _KBOOM; ++i)
+    mat->data[i * mat->cols + cols] = _BGN;
+  for(int j = cols + 1; j < (int) mat->cols && mat->data[lines * mat->cols + j] == _KBOOM; ++j)
+    mat->data[lines * mat->cols + j] = _BGN;
 }
+
 int kboom(struct matrix *mat, size_t lines, size_t cols, int field)
 {
   int x = (int)cols;
@@ -33,6 +37,7 @@ int kboom(struct matrix *mat, size_t lines, size_t cols, int field)
       left = 0;
     else if(mat->data[lines * mat->cols + i] == _PLAYER)
      isAlive = 0;
+
     mat->data[lines * mat->cols + i] = _KBOOM;
   }
 
@@ -58,25 +63,25 @@ int kboom(struct matrix *mat, size_t lines, size_t cols, int field)
 
   for (int j = y + 1; j < (int)mat->lines && down >= 0 && mat->data[j * mat->cols + cols] != _WALLU; ++j, --down)
   {
-    
     if (mat->data[j * mat->cols + cols] == _WALLE)
       down = 0;
     else if(mat->data[j * mat->cols + cols] == _PLAYER)
-      isAlive = 0; 
+      isAlive = 0;
+
     mat->data[j * mat->cols + cols] = _KBOOM;
   }
   if(!isAlive)
     return 0;
 
-  end_Bomb(mat, x, y);
+//  end_Bomb(mat, y, x);
   return 1;
 }
 
 void game(size_t lines, size_t cols)
 {
-  struct timespec start, end;
+  struct timespec current, end;
     
-  int isAlive = 1, bomb = 0;
+  int isAlive = 1, bomb = 0, expl = 0;
   struct matrix *mat = newMat(lines, cols);
   buildMap(mat);
 
@@ -92,14 +97,24 @@ void game(size_t lines, size_t cols)
   {
     if(bomb)
     {
-      clock_gettime(CLOCK_MONOTONIC, &start);
-      if(start.tv_sec >= end.tv_sec)
+      clock_gettime(CLOCK_MONOTONIC, &current);
+      if(current.tv_sec >= end.tv_sec)
       {
-        isAlive = kboom(mat, Y, X, 2);
-        bomb = 0;
+        if(expl)
+        {
+          end_Bomb(mat, Y, X);
+          expl = 0;
+          bomb = 0;
+        }
+        else
+        {
+          isAlive = kboom(mat, Y, X, 2);
+          clock_gettime(CLOCK_MONOTONIC, &end);
+          end.tv_sec += 1;
+          expl = 1;
+        }
       }
     }
-
     printMat(mat);
     char c = getchar();
 
@@ -152,7 +167,7 @@ void game(size_t lines, size_t cols)
         mat->data[posY * mat->cols + posX] = _BOMB;
         bomb = 1;
         clock_gettime(CLOCK_MONOTONIC, &end);
-        end.tv_sec += 3;
+        end.tv_sec += 2;
       }
     }
     printf("\e[1;1H\e[2J");
