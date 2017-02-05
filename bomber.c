@@ -70,11 +70,8 @@ int kboom(struct matrix *mat, size_t lines, size_t cols, int field)
 
     mat->data[j * mat->cols + cols] = _KBOOM;
   }
-  if(!isAlive)
-    return 0;
 
-//  end_Bomb(mat, y, x);
-  return 1;
+  return isAlive;
 }
 
 void game(size_t lines, size_t cols)
@@ -120,42 +117,62 @@ void game(size_t lines, size_t cols)
 
     if(c == 's' || c == '2')
     {
-      if(posY + 1 < mat->lines && mat->data[(posY + 1) * mat->cols + posX] == _BGN)
+      if(posY + 1 < mat->lines)
       {
-        if(mat->data[posY * mat->cols + posX] == _PLAYER)
-          mat->data[posY * mat->cols + posX] = _BGN;
-        ++posY;
-        mat->data[posY * mat->cols + posX] = _PLAYER;
+        if(mat->data[(posY + 1) * mat->cols + posX] == _BGN)
+        {
+          if(mat->data[posY * mat->cols + posX] == _PLAYER)
+            mat->data[posY * mat->cols + posX] = _BGN;
+          ++posY;
+          mat->data[posY * mat->cols + posX] = _PLAYER;
+        }
+        else if(mat->data[(posY + 1) * mat->cols + posX] == _KBOOM)
+         isAlive = 0;
       }
     }
     else if(c == 'z' || c == '8')
     {
-      if(posY != 0 && mat->data[(posY - 1) * mat->cols + posX] == _BGN)
+      if(posY != 0)
       {
-        if(mat->data[posY * mat->cols + posX] == _PLAYER)
-          mat->data[posY * mat->cols + posX] = _BGN;
-        --posY;
-        mat->data[posY * mat->cols + posX] = _PLAYER;
+        if(mat->data[(posY - 1) * mat->cols + posX] == _BGN)
+        {
+          if(mat->data[posY * mat->cols + posX] == _PLAYER)
+            mat->data[posY * mat->cols + posX] = _BGN;
+          --posY;
+          mat->data[posY * mat->cols + posX] = _PLAYER;
+        }
+        else if(mat->data[(posY - 1) * mat->cols + posX] == _KBOOM)
+          isAlive = 0;
       }
     }
     else if(c == 'd' || c == '6')
     {
-      if(posX + 1 < mat->cols && mat->data[posY * mat->cols + posX + 1] == _BGN)
+      if(posX + 1 < mat->cols)
       {
-        if(mat->data[posY * mat->cols + posX] == _PLAYER)
-          mat->data[posY * mat->cols + posX] = _BGN;
-        ++posX;
-        mat->data[posY * mat->cols + posX] = _PLAYER;
+        if(mat->data[posY * mat->cols + posX + 1] == _BGN)
+        {
+          if(mat->data[posY * mat->cols + posX] == _PLAYER)
+            mat->data[posY * mat->cols + posX] = _BGN;
+          ++posX;
+          mat->data[posY * mat->cols + posX] = _PLAYER;
+        }
+        else if(mat->data[posY * mat->cols + posX + 1] == _KBOOM)
+         isAlive = 0;
       }
     }
     else if(c == 'q' || c == '4')
     {
-      if(posX != 0 && mat->data[posY * mat->cols + posX - 1] == _BGN)
+      if(posX != 0)
       {
-        if(mat->data[posY * mat->cols + posX] == _PLAYER)
-          mat->data[posY * mat->cols + posX] = _BGN;
-        --posX;
-        mat->data[posY * mat->cols + posX] = _PLAYER;
+        if(mat->data[posY * mat->cols + posX - 1] == _BGN)
+        {
+          if(mat->data[posY * mat->cols + posX] == _PLAYER)
+            mat->data[posY * mat->cols + posX] = _BGN;
+          --posX;
+          mat->data[posY * mat->cols + posX] = _PLAYER;
+        }
+        else if(mat->data[posY * mat->cols + posX - 1] == _KBOOM)
+          isAlive = 0;
       }
     }
     else if(c == ' ')
