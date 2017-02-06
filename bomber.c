@@ -35,7 +35,7 @@ int kboom(struct matrix *mat, size_t lines, size_t cols, int field)
   {
     if (mat->data[lines * mat->cols + i] == _WALLE)
       left = 0;
-    else if(mat->data[lines * mat->cols + i] == _PLAYER)
+    else if(mat->data[lines * mat->cols + i] == _PLAYER || mat->data[lines * mat->cols + i] == _PLAYER2)
      isAlive = 0;
 
     mat->data[lines * mat->cols + i] = _KBOOM;
@@ -45,7 +45,7 @@ int kboom(struct matrix *mat, size_t lines, size_t cols, int field)
   {
     if (mat->data[j * mat->cols + cols] == _WALLE)
       up = 0;
-    else if(mat->data[j * mat->cols + cols] == _PLAYER)
+    else if(mat->data[j * mat->cols + cols] == _PLAYER || mat->data[j * mat->cols + cols] == _PLAYER2)
      isAlive = 0;
      
     mat->data[j * mat->cols + cols] = _KBOOM;
@@ -55,7 +55,7 @@ int kboom(struct matrix *mat, size_t lines, size_t cols, int field)
   {
     if (mat->data[lines * mat->cols + i] == _WALLE)
       right = 0;
-    else if(mat->data[lines * mat->cols + i] == _PLAYER)
+    else if(mat->data[lines * mat->cols + i] == _PLAYER || mat->data[lines * mat->cols + i] == _PLAYER2)
      isAlive = 0;
  
     mat->data[lines * mat->cols + i] = _KBOOM;
@@ -65,7 +65,7 @@ int kboom(struct matrix *mat, size_t lines, size_t cols, int field)
   {
     if (mat->data[j * mat->cols + cols] == _WALLE)
       down = 0;
-    else if(mat->data[j * mat->cols + cols] == _PLAYER)
+    else if(mat->data[j * mat->cols + cols] == _PLAYER || mat->data[j * mat->cols + cols] == _PLAYER2)
       isAlive = 0;
 
     mat->data[j * mat->cols + cols] = _KBOOM;
@@ -76,9 +76,8 @@ int kboom(struct matrix *mat, size_t lines, size_t cols, int field)
 
 void game(size_t lines, size_t cols)
 {
-  struct timespec current, end;
+  struct timespec current, end, current2, end2;
  
-  int bomb = 0, expl = 0;
   struct matrix *mat = newMat(lines, cols);
   struct player *player = NULL, *player1 = newPlayer(_PLAYER, mat);
   struct player *player2 = newPlayer(_PLAYER2, mat);
@@ -93,26 +92,48 @@ void game(size_t lines, size_t cols)
   
   while(player1->isAlive && player2->isAlive)
   {
-    if(bomb)
+    if(player1->bomb)
     {
       clock_gettime(CLOCK_MONOTONIC, &current);
       if(current.tv_sec >= end.tv_sec)
       {
-        if(expl)
+        if(player1->expl)
         {
           end_Bomb(mat, player1->Y, player1->X);
-          expl = 0;
-          bomb = 0;
+          player1->expl = 0;
+          player1->bomb = 0;
         }
         else
         {
-          player1->isAlive = kboom(mat, player1->Y, player1->X, player1->range);
+          player1->isAlive = kboom(mat, player1->Y, player1->Y, player1->range);
           clock_gettime(CLOCK_MONOTONIC, &end);
           end.tv_sec += 1;
-          expl = 1;
+          player1->expl = 1;
         }
       }
     }
+    if(player2->bomb)
+    {
+      clock_gettime(CLOCK_MONOTONIC, &current2);
+      if(current2.tv_sec >= end2.tv_sec)
+      {
+        if(player2->expl)
+        {
+          end_Bomb(mat, player2->Y, player2->X);
+          player2->expl = 0;
+          player2->bomb = 0;
+        }
+        else
+        {
+          player2->isAlive = kboom(mat, player2->Y, player2->X, player2->range);
+          clock_gettime(CLOCK_MONOTONIC, &end2);
+          end2.tv_sec += 1;
+          player2->expl = 1;
+        }
+      }
+    }
+
+   
     printMat(mat);
     char c = getchar();
 
@@ -204,21 +225,29 @@ void game(size_t lines, size_t cols)
       else
         player = player2;
 
-      if(mat->data[player->posY * mat->cols + player->posX] != _BOMB && bomb == 0)
+      if(mat->data[player->posY * mat->cols + player->posX] != _BOMB && player->bomb == 0)
       {
         player->X = player->posX;
         player->Y = player->posY;
         mat->data[player->posY * mat->cols + player->posX] = _BOMB;
-        bomb = 1;
-        clock_gettime(CLOCK_MONOTONIC, &end);
-        end.tv_sec += 2;
+        player->bomb = 1;
+        if(c == ' ')
+        {
+          clock_gettime(CLOCK_MONOTONIC, &end);
+          end.tv_sec += 2;
+        }
+        else
+        {
+          clock_gettime(CLOCK_MONOTONIC, &end2);
+          end2.tv_sec += 2;
+        }
       }
     }
     printf("\e[1;1H\e[2J");
   }
   freeMat(mat);
   free(player);
-  free(player2);
+//  free(player2);
 }
 
 int main()

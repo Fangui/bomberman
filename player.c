@@ -6,6 +6,8 @@ struct player *newPlayer(int val, struct matrix *mat)
   player->isAlive = 1;
   player->value = val;
   player->range = 0;
+  player->bomb = 0;
+  player->expl = 0;
 
   if(player->value == _PLAYER)
   {
