@@ -1,8 +1,9 @@
-# ifndef MATRIX_H_
-# define MATRIX_H_
+# ifndef MAP_H_
+# define MAP_H_
 
 # define _BOMB 666
 # define _PLAYER 42
+# define _PLAYER2 2020
 # define _BGN 41
 # define _WALLU 13
 # define _WALLE 27

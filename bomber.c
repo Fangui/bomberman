@@ -1,6 +1,6 @@
 # define _XOPEN_SOURCE 500
 
-# include "map.h"
+# include "player.h"
 
 # include <termios.h>
 # include <unistd.h>
@@ -77,12 +77,13 @@ int kboom(struct matrix *mat, size_t lines, size_t cols, int field)
 void game(size_t lines, size_t cols)
 {
   struct timespec current, end;
-    
-  int isAlive = 1, bomb = 0, expl = 0;
+ 
+  int bomb = 0, expl = 0;
   struct matrix *mat = newMat(lines, cols);
+  struct player *player = NULL, *player1 = newPlayer(_PLAYER, mat);
+  struct player *player2 = newPlayer(_PLAYER2, mat);
   buildMap(mat);
 
-  size_t posX = 0, posY = 0, X = 0, Y = 0;
   struct termios info;
   tcgetattr(0, &info);
   info.c_lflag &= ~ICANON;
@@ -90,7 +91,7 @@ void game(size_t lines, size_t cols)
   info.c_cc[VTIME] = 0;
   tcsetattr(0, TCSANOW, &info);
   
-  while(isAlive)
+  while(player1->isAlive && player2->isAlive)
   {
     if(bomb)
     {
@@ -99,13 +100,13 @@ void game(size_t lines, size_t cols)
       {
         if(expl)
         {
-          end_Bomb(mat, Y, X);
+          end_Bomb(mat, player1->Y, player1->X);
           expl = 0;
           bomb = 0;
         }
         else
         {
-          isAlive = kboom(mat, Y, X, 2);
+          player1->isAlive = kboom(mat, player1->Y, player1->X, player1->range);
           clock_gettime(CLOCK_MONOTONIC, &end);
           end.tv_sec += 1;
           expl = 1;
@@ -117,71 +118,97 @@ void game(size_t lines, size_t cols)
 
     if(c == 's' || c == '2')
     {
-      if(posY + 1 < mat->lines)
+      if(c == 's')
+        player = player1;
+      else
+        player = player2;
+
+      if(player->posY + 1 < mat->lines)
       {
-        if(mat->data[(posY + 1) * mat->cols + posX] == _BGN)
+        if(mat->data[(player->posY + 1) * mat->cols + player->posX] == _BGN)
         {
-          if(mat->data[posY * mat->cols + posX] == _PLAYER)
-            mat->data[posY * mat->cols + posX] = _BGN;
-          ++posY;
-          mat->data[posY * mat->cols + posX] = _PLAYER;
+          if(mat->data[player->posY * mat->cols + player->posX] == player->value)
+            mat->data[player->posY * mat->cols + player->posX] = _BGN;
+          ++player->posY;
+          mat->data[player->posY * mat->cols + player->posX] = player->value;
         }
-        else if(mat->data[(posY + 1) * mat->cols + posX] == _KBOOM)
-         isAlive = 0;
+        else if(mat->data[(player->posY + 1) * mat->cols + player->posX] == _KBOOM)
+         player->isAlive = 0;
       }
     }
     else if(c == 'z' || c == '8')
     {
-      if(posY != 0)
+      if(c == 'z')
+        player = player1;
+       else
+        player = player2;
+
+      if(player->posY != 0)
       {
-        if(mat->data[(posY - 1) * mat->cols + posX] == _BGN)
+        if(mat->data[(player->posY - 1) * mat->cols + player->posX] == _BGN)
         {
-          if(mat->data[posY * mat->cols + posX] == _PLAYER)
-            mat->data[posY * mat->cols + posX] = _BGN;
-          --posY;
-          mat->data[posY * mat->cols + posX] = _PLAYER;
+          printf("%d\n", player->value);
+          if(mat->data[player->posY * mat->cols + player->posX] == player->value)
+            mat->data[player->posY * mat->cols + player->posX] = _BGN;
+          --player->posY;
+          mat->data[player->posY * mat->cols + player->posX] = player->value;
         }
-        else if(mat->data[(posY - 1) * mat->cols + posX] == _KBOOM)
-          isAlive = 0;
+        else if(mat->data[(player->posY - 1) * mat->cols + player->posX] == _KBOOM)
+          player->isAlive = 0;
       }
     }
     else if(c == 'd' || c == '6')
     {
-      if(posX + 1 < mat->cols)
+      if(c == 'd')
+        player = player1;
+      else
+        player = player2;
+
+      if(player->posX + 1 < mat->cols)
       {
-        if(mat->data[posY * mat->cols + posX + 1] == _BGN)
+        if(mat->data[player->posY * mat->cols + player->posX + 1] == _BGN)
         {
-          if(mat->data[posY * mat->cols + posX] == _PLAYER)
-            mat->data[posY * mat->cols + posX] = _BGN;
-          ++posX;
-          mat->data[posY * mat->cols + posX] = _PLAYER;
+          if(mat->data[player->posY * mat->cols + player->posX] == player->value)
+            mat->data[player->posY * mat->cols + player->posX] = _BGN;
+          ++player->posX;
+          mat->data[player->posY * mat->cols + player->posX] = player->value;
         }
-        else if(mat->data[posY * mat->cols + posX + 1] == _KBOOM)
-         isAlive = 0;
+        else if(mat->data[player->posY * mat->cols + player->posX + 1] == _KBOOM)
+         player->isAlive = 0;
       }
     }
     else if(c == 'q' || c == '4')
     {
-      if(posX != 0)
+      if(c == 'q')
+        player = player1;
+      else
+        player = player2;
+
+      if(player->posX != 0)
       {
-        if(mat->data[posY * mat->cols + posX - 1] == _BGN)
+        if(mat->data[player->posY * mat->cols + player->posX - 1] == _BGN)
         {
-          if(mat->data[posY * mat->cols + posX] == _PLAYER)
-            mat->data[posY * mat->cols + posX] = _BGN;
-          --posX;
-          mat->data[posY * mat->cols + posX] = _PLAYER;
+          if(mat->data[player->posY * mat->cols + player->posX] == player->value)
+            mat->data[player->posY * mat->cols + player->posX] = _BGN;
+          --player->posX;
+          mat->data[player->posY * mat->cols + player->posX] = player->value;
         }
-        else if(mat->data[posY * mat->cols + posX - 1] == _KBOOM)
-          isAlive = 0;
+        else if(mat->data[player->posY * mat->cols + player->posX - 1] == _KBOOM)
+          player->isAlive = 0;
       }
     }
-    else if(c == ' ')
+    else if(c == ' ' || c == '5')
     {
-      if(mat->data[posY * mat->cols + posX] != _BOMB && bomb == 0)
+      if(c == ' ')
+        player = player1;
+      else
+        player = player2;
+
+      if(mat->data[player->posY * mat->cols + player->posX] != _BOMB && bomb == 0)
       {
-        X = posX;
-        Y = posY;
-        mat->data[posY * mat->cols + posX] = _BOMB;
+        player->X = player->posX;
+        player->Y = player->posY;
+        mat->data[player->posY * mat->cols + player->posX] = _BOMB;
         bomb = 1;
         clock_gettime(CLOCK_MONOTONIC, &end);
         end.tv_sec += 2;
@@ -190,7 +217,8 @@ void game(size_t lines, size_t cols)
     printf("\e[1;1H\e[2J");
   }
   freeMat(mat);
-
+  free(player);
+  free(player2);
 }
 
 int main()

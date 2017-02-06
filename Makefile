@@ -4,7 +4,7 @@ CFLAGS= -Wall -Wextra -std=c99 -g -o bomber
 LDFLAGS=
 LDLIBS=
  
-SRC= map.c
+SRC= map.c player.c
 
 OBJ= ${SRC:.c=.o} 
 all: bomber

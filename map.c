@@ -43,6 +43,8 @@ void buildMap(struct matrix *mat)
 
   *(mat -> data + (1 * mat -> cols + 2)) = _BGN;
   *(mat -> data + (1 * mat -> cols + 3)) = _BGN;
+
+  mat->data[(mat->lines - 1) * mat->cols + mat->cols - 1] = _PLAYER2;
 }
 
 void printMat(struct matrix *mat)
@@ -67,6 +69,9 @@ void printMat(struct matrix *mat)
           break;
         case _PLAYER:
           printf("P");
+          break;
+        case _PLAYER2:
+          printf("2");
           break;
         case _WALLE:
           printf("\"");
