@@ -29,46 +29,46 @@ int kboom(struct matrix *mat, size_t lines, size_t cols, int field)
   int down = up;
   int isAlive = 1;
 
-  mat->data[lines * mat->cols + cols] = _KBOOM;
+  mat->data[y * mat->cols + x] = _KBOOM;
 
-  for (int i = x - 1; i >= 0 && left >= 0 && mat->data[lines * mat->cols + i] != _WALLU; --i, --left)
+  for (int i = x - 1; i >= 0 && left >= 0 && mat->data[y * mat->cols + i] != _WALLU; --i, --left)
   {
-    if (mat->data[lines * mat->cols + i] == _WALLE)
+    if (mat->data[y * mat->cols + i] == _WALLE)
       left = 0;
-    else if(mat->data[lines * mat->cols + i] == _PLAYER || mat->data[lines * mat->cols + i] == _PLAYER2)
+    else if(mat->data[y * mat->cols + i] == _PLAYER || mat->data[y * mat->cols + i] == _PLAYER2)
      isAlive = 0;
 
-    mat->data[lines * mat->cols + i] = _KBOOM;
+    mat->data[y * mat->cols + i] = _KBOOM;
   }
 
-  for (int j = y - 1; j >= 0 && up >= 0 && mat->data[j * mat->cols + cols] != _WALLU; --j, --up)
+  for (int j = y - 1; j >= 0 && up >= 0 && mat->data[j * mat->cols + x] != _WALLU; --j, --up)
   {
-    if (mat->data[j * mat->cols + cols] == _WALLE)
+    if (mat->data[j * mat->cols + x] == _WALLE)
       up = 0;
-    else if(mat->data[j * mat->cols + cols] == _PLAYER || mat->data[j * mat->cols + cols] == _PLAYER2)
+    else if(mat->data[j * mat->cols + x] == _PLAYER || mat->data[j * mat->cols + x] == _PLAYER2)
      isAlive = 0;
      
-    mat->data[j * mat->cols + cols] = _KBOOM;
+    mat->data[j * mat->cols + x] = _KBOOM;
   }
 
-  for (int i = x + 1; i < (int)mat->cols && right >= 0 && mat->data[lines * mat->cols + i] != _WALLU; ++i, --right)
+  for (int i = x + 1; i < (int)mat->cols && right >= 0 && mat->data[y * mat->cols + i] != _WALLU; ++i, --right)
   {
-    if (mat->data[lines * mat->cols + i] == _WALLE)
+    if (mat->data[y * mat->cols + i] == _WALLE)
       right = 0;
-    else if(mat->data[lines * mat->cols + i] == _PLAYER || mat->data[lines * mat->cols + i] == _PLAYER2)
+    else if(mat->data[y * mat->cols + i] == _PLAYER || mat->data[y * mat->cols + i] == _PLAYER2)
      isAlive = 0;
  
-    mat->data[lines * mat->cols + i] = _KBOOM;
+    mat->data[y * mat->cols + i] = _KBOOM;
   }
 
   for (int j = y + 1; j < (int)mat->lines && down >= 0 && mat->data[j * mat->cols + cols] != _WALLU; ++j, --down)
   {
-    if (mat->data[j * mat->cols + cols] == _WALLE)
+    if (mat->data[j * mat->cols + x] == _WALLE)
       down = 0;
-    else if(mat->data[j * mat->cols + cols] == _PLAYER || mat->data[j * mat->cols + cols] == _PLAYER2)
+    else if(mat->data[j * mat->cols + x] == _PLAYER || mat->data[j * mat->cols + x] == _PLAYER2)
       isAlive = 0;
 
-    mat->data[j * mat->cols + cols] = _KBOOM;
+    mat->data[j * mat->cols + x] = _KBOOM;
   }
 
   return isAlive;

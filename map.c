@@ -73,7 +73,8 @@ void printMat(struct matrix *mat)
           printf("%s", _KWHT);
           break;
         case _PLAYER2:
-          printf("2");
+          printf("%sE", _KYLW);
+          printf("%s", _KWHT);
           break;
         case _WALLE:
           printf("\"");
