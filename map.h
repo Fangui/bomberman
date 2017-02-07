@@ -8,6 +8,7 @@
 # define _WALLU 13
 # define _WALLE 27
 # define _KBOOM 99
+# define _EXT 78
 
 # define _KRED "\x1B[31m"
 # define _KYLW "\x1B[33m"

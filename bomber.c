@@ -19,56 +19,83 @@ void end_Bomb(struct matrix *mat, int lines, int cols)
     mat->data[lines * mat->cols + j] = _BGN;
 }
 
-int kboom(struct matrix *mat, size_t lines, size_t cols, int field)
+int kboom(struct matrix *mat, struct player *player)
 {
-  int x = (int)cols;
-  int y = (int)lines;
-  int left = field;
+  int x = (int)player->X;
+  int y = (int)player->Y;
+  int left = player->range;
   int right = left;
   int up = left;
   int down = up;
   int isAlive = 1;
 
+  if(player->X == player->posX && player->Y == player->posY)
+    isAlive = 0;
+ 
   mat->data[y * mat->cols + x] = _KBOOM;
 
   for (int i = x - 1; i >= 0 && left >= 0 && mat->data[y * mat->cols + i] != _WALLU; --i, --left)
   {
-    if (mat->data[y * mat->cols + i] == _WALLE)
+    if(mat->data[y * mat->cols + i] == _BGN)
+      mat->data[y * mat->cols + i] = _KBOOM;
+    else if (mat->data[y * mat->cols + i] == _WALLE)
+    {
       left = 0;
+      if(rand() % 2 == 0)
+        mat->data[y * mat->cols + i] = _EXT;
+      else
+       mat->data[y * mat->cols + i] = _BGN;
+    }
     else if(mat->data[y * mat->cols + i] == _PLAYER || mat->data[y * mat->cols + i] == _PLAYER2)
      isAlive = 0;
-
-    mat->data[y * mat->cols + i] = _KBOOM;
   }
 
   for (int j = y - 1; j >= 0 && up >= 0 && mat->data[j * mat->cols + x] != _WALLU; --j, --up)
   {
-    if (mat->data[j * mat->cols + x] == _WALLE)
+    if(mat->data[j * mat->cols + x] == _BGN)
+      mat->data[j * mat->cols + x] = _KBOOM;
+    else if (mat->data[j * mat->cols + x] == _WALLE)
+    {
       up = 0;
+      if(rand() % 2 == 0)
+        mat->data[j * mat->cols + x] = _EXT;
+      else
+        mat->data[j * mat->cols + x] = _BGN;
+    }
     else if(mat->data[j * mat->cols + x] == _PLAYER || mat->data[j * mat->cols + x] == _PLAYER2)
      isAlive = 0;
-     
-    mat->data[j * mat->cols + x] = _KBOOM;
   }
 
   for (int i = x + 1; i < (int)mat->cols && right >= 0 && mat->data[y * mat->cols + i] != _WALLU; ++i, --right)
   {
-    if (mat->data[y * mat->cols + i] == _WALLE)
+    if(mat->data[y * mat->cols + i] == _BGN)
+      mat->data[y * mat->cols + i] = _KBOOM;
+    else if (mat->data[y * mat->cols + i] == _WALLE)
+    {
+      if(rand() % 2 == 0)
+        mat->data[y * mat->cols + i] = _EXT;
+      else
+        mat->data[y * mat->cols + i] = _BGN;
       right = 0;
+    }
     else if(mat->data[y * mat->cols + i] == _PLAYER || mat->data[y * mat->cols + i] == _PLAYER2)
      isAlive = 0;
- 
-    mat->data[y * mat->cols + i] = _KBOOM;
   }
 
-  for (int j = y + 1; j < (int)mat->lines && down >= 0 && mat->data[j * mat->cols + cols] != _WALLU; ++j, --down)
+  for (int j = y + 1; j < (int)mat->lines && down >= 0 && mat->data[j * mat->cols + x] != _WALLU; ++j, --down)
   {
-    if (mat->data[j * mat->cols + x] == _WALLE)
+    if(mat->data[j * mat->cols + x] == _BGN)
+      mat->data[j * mat->cols + x] = _KBOOM;
+    else if (mat->data[j * mat->cols + x] == _WALLE)
+    {
       down = 0;
+      if(rand() % 2 == 0)
+        mat->data[j * mat->cols + x] = _EXT;
+      else
+       mat->data[j * mat->cols + x] = _BGN;
+    }
     else if(mat->data[j * mat->cols + x] == _PLAYER || mat->data[j * mat->cols + x] == _PLAYER2)
       isAlive = 0;
-
-    mat->data[j * mat->cols + x] = _KBOOM;
   }
 
   return isAlive;
@@ -105,7 +132,7 @@ void game(size_t lines, size_t cols)
         }
         else
         {
-          player1->isAlive = kboom(mat, player1->Y, player1->X, player1->range);
+          player1->isAlive = kboom(mat, player1);
           clock_gettime(CLOCK_MONOTONIC, &end);
           end.tv_sec += 1;
           player1->expl = 1;
@@ -125,7 +152,7 @@ void game(size_t lines, size_t cols)
         }
         else
         {
-          player2->isAlive = kboom(mat, player2->Y, player2->X, player2->range);
+          player2->isAlive = kboom(mat, player2);
           clock_gettime(CLOCK_MONOTONIC, &end2);
           end2.tv_sec += 1;
           player2->expl = 1;
@@ -146,8 +173,10 @@ void game(size_t lines, size_t cols)
 
       if(player->posY + 1 < mat->lines)
       {
-        if(mat->data[(player->posY + 1) * mat->cols + player->posX] == _BGN)
+        if(mat->data[(player->posY + 1) * mat->cols + player->posX] == _BGN || mat->data[(player->posY + 1) * mat->cols + player->posX] == _EXT)
         {
+          if(mat->data[(player->posY + 1) * mat->cols + player->posX] == _EXT)
+            ++player->range;
           if(mat->data[player->posY * mat->cols + player->posX] == player->value)
             mat->data[player->posY * mat->cols + player->posX] = _BGN;
           ++player->posY;
@@ -166,9 +195,10 @@ void game(size_t lines, size_t cols)
 
       if(player->posY != 0)
       {
-        if(mat->data[(player->posY - 1) * mat->cols + player->posX] == _BGN)
+        if(mat->data[(player->posY - 1) * mat->cols + player->posX] == _BGN || mat->data[(player->posY - 1) * mat->cols + player->posX] == _EXT)
         {
-          printf("%d\n", player->value);
+          if(mat->data[(player->posY - 1) * mat->cols + player->posX] == _EXT)
+            ++player->range;
           if(mat->data[player->posY * mat->cols + player->posX] == player->value)
             mat->data[player->posY * mat->cols + player->posX] = _BGN;
           --player->posY;
@@ -187,8 +217,10 @@ void game(size_t lines, size_t cols)
 
       if(player->posX + 1 < mat->cols)
       {
-        if(mat->data[player->posY * mat->cols + player->posX + 1] == _BGN)
+        if(mat->data[player->posY * mat->cols + player->posX + 1] == _BGN || mat->data[player->posY * mat->cols + player->posX + 1] == _EXT)
         {
+          if(mat->data[player->posY * mat->cols + player->posX + 1] == _EXT)
+            ++player->range;
           if(mat->data[player->posY * mat->cols + player->posX] == player->value)
             mat->data[player->posY * mat->cols + player->posX] = _BGN;
           ++player->posX;
@@ -207,8 +239,10 @@ void game(size_t lines, size_t cols)
 
       if(player->posX != 0)
       {
-        if(mat->data[player->posY * mat->cols + player->posX - 1] == _BGN)
+        if(mat->data[player->posY * mat->cols + player->posX - 1] == _BGN || mat->data[player->posY * mat->cols + player->posX - 1] == _EXT)
         {
+          if(mat->data[player->posY * mat->cols + player->posX - 1] == _EXT)
+            ++player->range;
           if(mat->data[player->posY * mat->cols + player->posX] == player->value)
             mat->data[player->posY * mat->cols + player->posX] = _BGN;
           --player->posX;
