@@ -65,10 +65,11 @@ void printMat(struct matrix *mat)
           printf(" ");
           break;
         case _BOMB:
-          printf("B");
+          printf("%sB", _KRED);
+          printf("%s", _KWHT);
           break;
         case _PLAYER:
-          printf("%sP", _TEST);
+          printf("%sP", _KBLU);
           printf("%s", _KWHT);
           break;
         case _PLAYER2:
@@ -81,7 +82,8 @@ void printMat(struct matrix *mat)
           printf("#");
           break;
         case _KBOOM:
-          printf("+");
+          printf("%s+", _KRED);
+          printf("%s", _KWHT);
           break;
         default:
           break;
