@@ -9,6 +9,12 @@
 # define _WALLE 27
 # define _KBOOM 99
 
+# define _KRED "\x1B[31m"
+# define _KGRN "\x1B[32m"
+# define _KBLU "\x1B[34m"
+# define _KWHT "\x1B[37m"
+# define _TEST "\033[36m"
+
 # include <stdio.h>
 # include <stdlib.h>
 # include <time.h>

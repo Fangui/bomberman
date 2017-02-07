@@ -24,9 +24,9 @@ int kboom(struct matrix *mat, size_t lines, size_t cols, int field)
   int x = (int)cols;
   int y = (int)lines;
   int left = field;
-  int right = field;
-  int up = field;
-  int down = field;
+  int right = left;
+  int up = left;
+  int down = up;
   int isAlive = 1;
 
   mat->data[lines * mat->cols + cols] = _KBOOM;
@@ -105,7 +105,7 @@ void game(size_t lines, size_t cols)
         }
         else
         {
-          player1->isAlive = kboom(mat, player1->Y, player1->Y, player1->range);
+          player1->isAlive = kboom(mat, player1->Y, player1->X, player1->range);
           clock_gettime(CLOCK_MONOTONIC, &end);
           end.tv_sec += 1;
           player1->expl = 1;
@@ -246,8 +246,8 @@ void game(size_t lines, size_t cols)
     printf("\e[1;1H\e[2J");
   }
   freeMat(mat);
-  free(player);
-//  free(player2);
+  free(player1);
+  free(player2);
 }
 
 int main()
