@@ -287,9 +287,7 @@ void game(size_t lines, size_t cols)
 
 int main()
 {
-  size_t lines = 13;
-//  printf("lines & cols ? : ");
-//  scanf("%zu", &lines);
+  size_t lines = 9;
   game(lines, lines * 2);
 
   return 0;

@@ -103,7 +103,8 @@ void printMat(struct matrix *mat)
           printf("%s", _KWHT);
           break;
         case _WALLE:
-          printf("\"");
+          printf("%s\"", "\x1B[32m");
+          printf("%s", _KWHT);
           break;
         case _WALLU:
           printf("#");

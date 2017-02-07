@@ -1,6 +1,6 @@
 CC=gcc
 CPPFLAGS=
-CFLAGS= -Wall -Wextra -std=c99 -g -o bomber
+CFLAGS= -Wall -Wextra -std=c99 -O2 -o bomber
 LDFLAGS=
 LDLIBS=
  
