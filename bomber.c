@@ -109,6 +109,7 @@ void game(size_t lines, size_t cols)
   struct player *player = NULL, *player1 = newPlayer(_PLAYER, mat);
   struct player *player2 = newPlayer(_PLAYER2, mat);
   buildMap(mat);
+  randomMap(mat);
 
   struct termios info;
   tcgetattr(0, &info);
@@ -268,12 +269,12 @@ void game(size_t lines, size_t cols)
         if(c == ' ')
         {
           clock_gettime(CLOCK_MONOTONIC, &end);
-          end.tv_sec += 2;
+          end.tv_sec += 3;
         }
         else
         {
           clock_gettime(CLOCK_MONOTONIC, &end2);
-          end2.tv_sec += 2;
+          end2.tv_sec += 3;
         }
       }
     }

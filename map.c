@@ -1,8 +1,6 @@
 # include "map.h"
 # include <time.h>
 
-# define _CONVO newMat(3, 3)
-
 struct matrix * newMat(size_t lines, size_t cols)
 {
   struct matrix *mat = malloc(sizeof(struct matrix));
@@ -28,24 +26,25 @@ void buildMap(struct matrix *mat)
     for (size_t j = 0; j < mat -> cols; ++j)
     {
       n = rand() % 42;
-      if (n <= 13)
+      if (n <= 11)
       { *(mat -> data + (i * mat -> cols + j)) = _WALLU; }
-      else if (n <= 27)
+      else if (n <= 29)
       { *(mat -> data + (i * mat -> cols + j)) = _WALLE; }
       else
       { *(mat -> data + (i * mat -> cols + j)) = _BGN; }
     }
   }
 
-  // Around the player to begin
+  // Around the player 1 to begin
   *(mat -> data) = _PLAYER;
   *(mat -> data + 1) = _BGN;
   *(mat -> data + (1 * mat -> cols + 0)) = _BGN;
   *(mat -> data + (1 * mat -> cols + 1)) = _BGN;
 
-  *(mat -> data + (1 * mat -> cols + 2)) = _BGN;
-  *(mat -> data + (1 * mat -> cols + 3)) = _BGN;
-
+  // Around the player 2 to begin
+  *(mat -> data + ((mat -> lines - 2) * mat -> cols + (mat -> cols - 2))) = _BGN;
+  *(mat -> data + ((mat -> lines - 2) * mat -> cols + (mat -> cols - 1))) = _BGN;
+  *(mat -> data + ((mat -> lines - 1) * mat -> cols + (mat -> cols - 2))) = _BGN;
   mat->data[(mat->lines - 1) * mat->cols + mat->cols - 1] = _PLAYER2;
 }
 
@@ -67,7 +66,8 @@ void randomMap(struct matrix *map)
       if (generated >= 5)
       {
         *(map -> data + (i * map -> cols + j)) = 41;
-        *(map -> data + ((i + 1) * map -> cols + j + 1)) = 27;
+        *(map -> data + ((i + 1) * map -> cols + j + 1)) = 41;
+        *(map -> data + ((i + 2) * map -> cols + j + 2)) = 41;
       }
     }
   }
