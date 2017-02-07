@@ -37,4 +37,6 @@ void printMat(struct matrix *mat);
 
 void buildMap(struct matrix *mat);
 
+void randomMap(struct matrix *map);
+
 # endif

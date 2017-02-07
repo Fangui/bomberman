@@ -1,6 +1,8 @@
 # include "map.h"
 # include <time.h>
 
+# define _CONVO newMat(3, 3)
+
 struct matrix * newMat(size_t lines, size_t cols)
 {
   struct matrix *mat = malloc(sizeof(struct matrix));
@@ -45,6 +47,30 @@ void buildMap(struct matrix *mat)
   *(mat -> data + (1 * mat -> cols + 3)) = _BGN;
 
   mat->data[(mat->lines - 1) * mat->cols + mat->cols - 1] = _PLAYER2;
+}
+
+void randomMap(struct matrix *map)
+{
+  for (size_t i = 0; i < map -> lines - 3; ++i)
+  {
+    for (size_t j = 0; j < map -> cols - 3; ++j)
+    {
+      int generated = 0;
+      for (size_t n = i; n < i + 3; ++n)
+      {
+        for (size_t m = j; m < j + 3; ++m)
+        {
+          if (*(map -> data + (n * map -> cols + m)) == 13)
+          { ++generated; }
+        }
+      }
+      if (generated >= 5)
+      {
+        *(map -> data + (i * map -> cols + j)) = 41;
+        *(map -> data + ((i + 1) * map -> cols + j + 1)) = 27;
+      }
+    }
+  }
 }
 
 void printMat(struct matrix *mat)
