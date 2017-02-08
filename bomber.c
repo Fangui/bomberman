@@ -1,9 +1,44 @@
 # define _XOPEN_SOURCE 500
 
-# include "player.h"
+# include "vector.h"
 
 # include <termios.h>
 # include <unistd.h>
+
+struct vector *generate_Bomb(struct matrix *mat)
+{
+  struct vector *vect = vector_make(16);
+  struct Tuple *tup;
+
+  for(size_t i = 0; i < mat->lines; ++i)
+  {
+    for(size_t j = 0; j < mat->cols; ++j)
+    {
+      if(mat->data[i * mat->cols + j] == _BGN && rand() % 15 == 0)
+      {
+        tup = malloc(sizeof(struct Tuple));
+        tup->t1 = i;
+        tup->t2 = j;
+        vector_push_back(vect, tup);
+
+        mat->data[i * mat->cols + j] = _BOMB;
+      }
+    }
+  }
+  return vect;
+}
+
+void clear_Bomb(struct matrix *mat)
+{
+  for(size_t i = 0; i < mat->lines; ++i)
+  {
+    for(size_t j = 0; j < mat->cols; ++j)
+    {
+      if(mat->data[i * mat->cols + j] == _KBOOM)
+        mat->data[i * mat->cols + j] = _BGN;
+    } 
+  }
+}
 
 void end_Bomb(struct matrix *mat, int lines, int cols)
 {
@@ -19,10 +54,10 @@ void end_Bomb(struct matrix *mat, int lines, int cols)
     mat->data[lines * mat->cols + j] = _BGN;
 }
 
-int kboom(struct matrix *mat, struct player *player)
+int kboom(struct matrix *mat, struct player *player, int lines, int cols)
 {
-  int x = (int)player->X;
-  int y = (int)player->Y;
+  int x = cols;
+  int y = lines;
   int left = player->range;
   int right = left;
   int up = left;
@@ -41,7 +76,7 @@ int kboom(struct matrix *mat, struct player *player)
     else if (mat->data[y * mat->cols + i] == _WALLE)
     {
       left = 0;
-      if(rand() % 2 == 0)
+      if(rand() % 1 == 0)
         mat->data[y * mat->cols + i] = _EXT;
       else
        mat->data[y * mat->cols + i] = _BGN;
@@ -73,7 +108,7 @@ int kboom(struct matrix *mat, struct player *player)
     else if (mat->data[y * mat->cols + i] == _WALLE)
     {
       if(rand() % 2 == 0)
-        mat->data[y * mat->cols + i] = _EXT;
+        mat->data[y * mat->cols + i] = _DIE;
       else
         mat->data[y * mat->cols + i] = _BGN;
       right = 0;
@@ -90,7 +125,7 @@ int kboom(struct matrix *mat, struct player *player)
     {
       down = 0;
       if(rand() % 2 == 0)
-        mat->data[j * mat->cols + x] = _EXT;
+        mat->data[j * mat->cols + x] = _DIE;
       else
        mat->data[j * mat->cols + x] = _BGN;
     }
@@ -103,9 +138,10 @@ int kboom(struct matrix *mat, struct player *player)
 
 void game(size_t lines, size_t cols)
 {
-  struct timespec current, end, current2, end2;
- 
+  int data, generat = 0, expl3 = 0;
+  struct timespec current, end, end2, end3;
   struct matrix *mat = newMat(lines, cols);
+  struct vector *vect;
   struct player *player = NULL, *player1 = newPlayer(_PLAYER, mat);
   struct player *player2 = newPlayer(_PLAYER2, mat);
   buildMap(mat);
@@ -120,7 +156,7 @@ void game(size_t lines, size_t cols)
   
   while(player1->isAlive && player2->isAlive)
   {
-    if(player1->bomb)
+    if(player1->bomb || player2->bomb || generat)
     {
       clock_gettime(CLOCK_MONOTONIC, &current);
       if(current.tv_sec >= end.tv_sec)
@@ -133,35 +169,55 @@ void game(size_t lines, size_t cols)
         }
         else
         {
-          player1->isAlive = kboom(mat, player1);
+          player1->isAlive = kboom(mat, player1, player1->Y, player1->X);
           clock_gettime(CLOCK_MONOTONIC, &end);
           end.tv_sec += 1;
           player1->expl = 1;
         }
       }
-    }
-    if(player2->bomb)
-    {
-      clock_gettime(CLOCK_MONOTONIC, &current2);
-      if(current2.tv_sec >= end2.tv_sec)
+      if(player2->bomb)
       {
-        if(player2->expl)
+        if(current.tv_sec >= end2.tv_sec)
         {
-          end_Bomb(mat, player2->Y, player2->X);
-          player2->expl = 0;
-          player2->bomb = 0;
+          if(player2->expl)
+          {
+            end_Bomb(mat, player2->Y, player2->X);
+            player2->expl = 0;
+            player2->bomb = 0;
+          }
+          else
+          {
+            player2->isAlive = kboom(mat, player2, player2->Y, player2->X);
+            clock_gettime(CLOCK_MONOTONIC, &end2);
+            end2.tv_sec += 1;
+            player2->expl = 1;
+          }
         }
-        else
+      }
+      if(generat)
+      {
+        if(current.tv_sec >= end3.tv_sec)
         {
-          player2->isAlive = kboom(mat, player2);
-          clock_gettime(CLOCK_MONOTONIC, &end2);
-          end2.tv_sec += 1;
-          player2->expl = 1;
+          if(!expl3)
+          {
+            for(int i = 0; i < vect->size; ++i)
+              player1->isAlive = kboom(mat, player1, vect->data[i]->t1, vect->data[i]->t2);
+            freeVect(vect);
+            end3.tv_sec += 1;
+            expl3 = 1;
+          }
+          else
+          {
+//            for(int i = 0; i < vect->size; ++i)
+//              end_Bomb(mat, vect->data[i]->t1, vect->data[i]->t2);
+            clear_Bomb(mat);
+            expl3 = 0;
+            generat = 0;
+//            freeVect(vect);
+          }
         }
       }
     }
-
-   
     printMat(mat);
     char c = getchar();
 
@@ -174,10 +230,19 @@ void game(size_t lines, size_t cols)
 
       if(player->posY + 1 < mat->lines)
       {
-        if(mat->data[(player->posY + 1) * mat->cols + player->posX] == _BGN || mat->data[(player->posY + 1) * mat->cols + player->posX] == _EXT)
+        data = mat->data[(player->posY + 1) * mat->cols + player->posX];
+        if(data >= _BGN)
         {
           if(mat->data[(player->posY + 1) * mat->cols + player->posX] == _EXT)
             ++player->range;
+          else if(data == _DIE)
+          {
+            vect = generate_Bomb(mat);
+            generat = 1;
+            clock_gettime(CLOCK_MONOTONIC, &end3);
+            end3.tv_sec += 3;
+          }
+
           if(mat->data[player->posY * mat->cols + player->posX] == player->value)
             mat->data[player->posY * mat->cols + player->posX] = _BGN;
           ++player->posY;
@@ -196,10 +261,19 @@ void game(size_t lines, size_t cols)
 
       if(player->posY != 0)
       {
-        if(mat->data[(player->posY - 1) * mat->cols + player->posX] == _BGN || mat->data[(player->posY - 1) * mat->cols + player->posX] == _EXT)
+        if(mat->data[(player->posY - 1) * mat->cols + player->posX] >= _BGN)
         {
           if(mat->data[(player->posY - 1) * mat->cols + player->posX] == _EXT)
             ++player->range;
+          else if(mat->data[(player->posY - 1) * mat->cols + player->posX] == _DIE)
+          {
+            vect = generate_Bomb(mat);
+            generat = 1;
+            clock_gettime(CLOCK_MONOTONIC, &end3);
+            end3.tv_sec += 3;
+
+          }
+
           if(mat->data[player->posY * mat->cols + player->posX] == player->value)
             mat->data[player->posY * mat->cols + player->posX] = _BGN;
           --player->posY;
@@ -218,10 +292,18 @@ void game(size_t lines, size_t cols)
 
       if(player->posX + 1 < mat->cols)
       {
-        if(mat->data[player->posY * mat->cols + player->posX + 1] == _BGN || mat->data[player->posY * mat->cols + player->posX + 1] == _EXT)
+        if(mat->data[player->posY * mat->cols + player->posX + 1] >= _BGN)
         {
           if(mat->data[player->posY * mat->cols + player->posX + 1] == _EXT)
             ++player->range;
+          else if(mat->data[player->posY * mat->cols + player->posX + 1] == _DIE)
+          {
+            vect = generate_Bomb(mat);
+            generat = 1;
+            clock_gettime(CLOCK_MONOTONIC, &end3);
+            end3.tv_sec += 3;
+          }
+
           if(mat->data[player->posY * mat->cols + player->posX] == player->value)
             mat->data[player->posY * mat->cols + player->posX] = _BGN;
           ++player->posX;
@@ -240,10 +322,18 @@ void game(size_t lines, size_t cols)
 
       if(player->posX != 0)
       {
-        if(mat->data[player->posY * mat->cols + player->posX - 1] == _BGN || mat->data[player->posY * mat->cols + player->posX - 1] == _EXT)
+        if(mat->data[player->posY * mat->cols + player->posX - 1] >= _BGN)
         {
           if(mat->data[player->posY * mat->cols + player->posX - 1] == _EXT)
             ++player->range;
+          else if(mat->data[player->posY * mat->cols + player->posX - 1] == _DIE)
+          {
+            generat = 1;
+            vect = generate_Bomb(mat);
+            clock_gettime(CLOCK_MONOTONIC, &end3);
+            end3.tv_sec += 3;
+          }
+
           if(mat->data[player->posY * mat->cols + player->posX] == player->value)
             mat->data[player->posY * mat->cols + player->posX] = _BGN;
           --player->posX;
@@ -287,7 +377,7 @@ void game(size_t lines, size_t cols)
 
 int main()
 {
-  size_t lines = 9;
+  size_t lines = 21;
   game(lines, lines * 2);
 
   return 0;

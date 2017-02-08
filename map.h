@@ -4,11 +4,12 @@
 # define _BOMB 666
 # define _PLAYER 42
 # define _PLAYER2 2020
-# define _BGN 41
+# define _BGN 8849
 # define _WALLU 13
 # define _WALLE 27
 # define _KBOOM 99
-# define _EXT 78
+# define _EXT 8850
+# define _DIE 8851
 
 # define _KRED "\x1B[31m"
 # define _KYLW "\x1B[33m"

@@ -59,15 +59,15 @@ void randomMap(struct matrix *map)
       {
         for (size_t m = j; m < j + 3; ++m)
         {
-          if (*(map -> data + (n * map -> cols + m)) == 13)
+          if (*(map -> data + (n * map -> cols + m)) == _WALLU)
           { ++generated; }
         }
       }
       if (generated >= 5)
       {
-        *(map -> data + (i * map -> cols + j)) = 41;
-        *(map -> data + ((i + 1) * map -> cols + j + 1)) = 41;
-        *(map -> data + ((i + 2) * map -> cols + j + 2)) = 41;
+        *(map -> data + (i * map -> cols + j)) = _BGN;
+        *(map -> data + ((i + 1) * map -> cols + j + 1)) = _BGN;
+        *(map -> data + ((i + 2) * map -> cols + j + 2)) = _BGN;
       }
     }
   }
@@ -91,16 +91,13 @@ void printMat(struct matrix *mat)
           printf(" ");
           break;
         case _BOMB:
-          printf("%sB", _KRED);
-          printf("%s", _KWHT);
+          printf("%sB%s", _KRED, _KWHT);
           break;
         case _PLAYER:
-          printf("%sP", _KBLU);
-          printf("%s", _KWHT);
+          printf("%sP%s", _KBLU, _KWHT);
           break;
         case _PLAYER2:
-          printf("%sS", _KYLW);
-          printf("%s", _KWHT);
+          printf("%sS%s", _KYLW, _KWHT);
           break;
         case _WALLE:
           printf("%s\"", "\x1B[32m");
@@ -110,11 +107,13 @@ void printMat(struct matrix *mat)
           printf("#");
           break;
         case _KBOOM:
-          printf("%s+", _KRED);
-          printf("%s", _KWHT);
+          printf("%s+%s", _KRED, _KWHT);
           break;
         case _EXT:
           printf("E");
+          break;
+        case _DIE:
+          printf("%sD%s", _KRED, _KWHT);
           break;
         default:
           break;
