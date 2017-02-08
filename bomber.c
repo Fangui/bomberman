@@ -159,20 +159,23 @@ void game(size_t lines, size_t cols)
     if(player1->bomb || player2->bomb || generat)
     {
       clock_gettime(CLOCK_MONOTONIC, &current);
-      if(current.tv_sec >= end.tv_sec)
+      if(player1->bomb)
       {
-        if(player1->expl)
+        if(current.tv_sec >= end.tv_sec)
         {
-          end_Bomb(mat, player1->Y, player1->X);
-          player1->expl = 0;
-          player1->bomb = 0;
-        }
-        else
-        {
-          player1->isAlive = kboom(mat, player1, player1->Y, player1->X);
-          clock_gettime(CLOCK_MONOTONIC, &end);
-          end.tv_sec += 1;
-          player1->expl = 1;
+          if(player1->expl)
+          {
+            end_Bomb(mat, player1->Y, player1->X);
+            player1->expl = 0;
+            player1->bomb = 0;
+          }
+          else
+          {
+            player1->isAlive = kboom(mat, player1, player1->Y, player1->X);
+            clock_gettime(CLOCK_MONOTONIC, &end);
+            end.tv_sec += 1;
+            player1->expl = 1;
+          }
         }
       }
       if(player2->bomb)
