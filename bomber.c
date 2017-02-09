@@ -5,9 +5,8 @@
 # include <termios.h>
 # include <unistd.h>
 
-struct vector *generate_Bomb(struct matrix *mat)
+void generate_Bomb(struct matrix *mat, struct vector *vect)
 {
-  struct vector *vect = vector_make(16);
   struct Tuple *tup;
 
   for(size_t i = 0; i < mat->lines; ++i)
@@ -25,7 +24,6 @@ struct vector *generate_Bomb(struct matrix *mat)
       }
     }
   }
-  return vect;
 }
 
 void clear_Bomb(struct matrix *mat)
@@ -158,7 +156,7 @@ void game(size_t lines, size_t cols)
   int data, generat = 0, expl3 = 0;
   struct timespec current, end, end2, end3;
   struct matrix *mat = newMat(lines, cols);
-  struct vector *vect;
+  struct vector *vect = vector_make(16);
   struct player *player = NULL, *player1 = newPlayer(_PLAYER, mat);
   struct player *player2 = newPlayer(_PLAYER2, mat);
   buildMap(mat);
@@ -222,7 +220,7 @@ void game(size_t lines, size_t cols)
           {
             for(int i = 0; i < vect->size; ++i)
               player1->isAlive = kboom(mat, player1, vect->data[i]->t1, vect->data[i]->t2);
-            freeVect(vect);
+            clearVect(vect);
             end3.tv_sec += 1;
             expl3 = 1;
           }
@@ -257,7 +255,7 @@ void game(size_t lines, size_t cols)
             ++player->range;
           else if(data == _DIE)
           {
-            vect = generate_Bomb(mat);
+            generate_Bomb(mat, vect);
             generat = 1;
             clock_gettime(CLOCK_MONOTONIC, &end3);
             end3.tv_sec += 3;
@@ -287,7 +285,7 @@ void game(size_t lines, size_t cols)
             ++player->range;
           else if(mat->data[(player->posY - 1) * mat->cols + player->posX] == _DIE)
           {
-            vect = generate_Bomb(mat);
+            generate_Bomb(mat, vect);
             generat = 1;
             clock_gettime(CLOCK_MONOTONIC, &end3);
             end3.tv_sec += 3;
@@ -318,7 +316,7 @@ void game(size_t lines, size_t cols)
             ++player->range;
           else if(mat->data[player->posY * mat->cols + player->posX + 1] == _DIE)
           {
-            vect = generate_Bomb(mat);
+            generate_Bomb(mat, vect);
             generat = 1;
             clock_gettime(CLOCK_MONOTONIC, &end3);
             end3.tv_sec += 3;
@@ -349,7 +347,7 @@ void game(size_t lines, size_t cols)
           else if(mat->data[player->posY * mat->cols + player->posX - 1] == _DIE)
           {
             generat = 1;
-            vect = generate_Bomb(mat);
+            generate_Bomb(mat, vect);
             clock_gettime(CLOCK_MONOTONIC, &end3);
             end3.tv_sec += 3;
           }
@@ -390,6 +388,7 @@ void game(size_t lines, size_t cols)
     }
     printf("\e[1;1H\e[2J");
   }
+  freeVect(vect);
   freeMat(mat);
   free(player1);
   free(player2);
