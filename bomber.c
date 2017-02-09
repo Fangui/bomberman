@@ -8,34 +8,33 @@
 void generate_Bomb(struct matrix *mat, struct vector *vect)
 {
   struct Tuple *tup;
-
+  size_t pos;
   for(size_t i = 0; i < mat->lines; ++i)
-  {
     for(size_t j = 0; j < mat->cols; ++j)
     {
-      if(mat->data[i * mat->cols + j] == _BGN && rand() % 15 == 0)
+      pos = i * mat->cols + j;
+      if(mat->data[pos] == _BGN && rand() % 15 == 0)
       {
         tup = malloc(sizeof(struct Tuple));
         tup->t1 = i;
         tup->t2 = j;
         vector_push_back(vect, tup);
 
-        mat->data[i * mat->cols + j] = _BOMB;
+        mat->data[pos] = _BOMB;
       }
     }
-  }
 }
 
 void clear_Bomb(struct matrix *mat)
 {
+  size_t pos;
   for(size_t i = 0; i < mat->lines; ++i)
-  {
     for(size_t j = 0; j < mat->cols; ++j)
     {
-      if(mat->data[i * mat->cols + j] == _KBOOM)
-        mat->data[i * mat->cols + j] = _BGN;
+      pos = i * mat->cols + j;
+      if(mat->data[pos] == _KBOOM)
+        mat->data[pos] = _BGN;
     } 
-  }
 }
 
 void end_Bomb(struct matrix *mat, int lines, int cols)
