@@ -63,6 +63,7 @@ int kboom(struct matrix *mat, struct player *player, int lines, int cols)
   int up = left;
   int down = up;
   int isAlive = 1;
+  int r, pos;
 
   if(player->X == player->posX && player->Y == player->posY)
     isAlive = 0;
@@ -71,65 +72,81 @@ int kboom(struct matrix *mat, struct player *player, int lines, int cols)
 
   for (int i = x - 1; i >= 0 && left >= 0 && mat->data[y * mat->cols + i] != _WALLU; --i, --left)
   {
-    if(mat->data[y * mat->cols + i] == _BGN)
-      mat->data[y * mat->cols + i] = _KBOOM;
-    else if (mat->data[y * mat->cols + i] == _WALLE)
+    pos = y * mat->cols + i;
+    if(mat->data[pos] == _BGN)
+      mat->data[pos] = _KBOOM;
+    else if (mat->data[pos] == _WALLE)
     {
       left = 0;
-      if(rand() % 1 == 0)
-        mat->data[y * mat->cols + i] = _EXT;
+      r = rand() % 40;
+      if(r == 0)
+        mat->data[pos] = _DIE;
+      else if(r < 10)
+        mat->data[pos] = _EXT;
       else
-       mat->data[y * mat->cols + i] = _BGN;
+        mat->data[pos] = _BGN;
     }
-    else if(mat->data[y * mat->cols + i] == _PLAYER || mat->data[y * mat->cols + i] == _PLAYER2)
+    else if(mat->data[pos] == _PLAYER || mat->data[pos] == _PLAYER2)
      isAlive = 0;
   }
 
   for (int j = y - 1; j >= 0 && up >= 0 && mat->data[j * mat->cols + x] != _WALLU; --j, --up)
   {
-    if(mat->data[j * mat->cols + x] == _BGN)
-      mat->data[j * mat->cols + x] = _KBOOM;
-    else if (mat->data[j * mat->cols + x] == _WALLE)
+    pos = j * mat->cols + x;
+    if(mat->data[pos] == _BGN)
+      mat->data[pos] = _KBOOM;
+    else if (mat->data[pos] == _WALLE)
     {
       up = 0;
-      if(rand() % 2 == 0)
-        mat->data[j * mat->cols + x] = _EXT;
+      r = rand() % 40;
+      if(r == 0)
+        mat->data[pos] = _DIE;
+      else if(r < 10)
+        mat->data[pos] = _EXT;
       else
-        mat->data[j * mat->cols + x] = _BGN;
+        mat->data[pos] = _BGN;
     }
-    else if(mat->data[j * mat->cols + x] == _PLAYER || mat->data[j * mat->cols + x] == _PLAYER2)
+    else if(mat->data[pos] == _PLAYER || mat->data[pos] == _PLAYER2)
      isAlive = 0;
   }
 
   for (int i = x + 1; i < (int)mat->cols && right >= 0 && mat->data[y * mat->cols + i] != _WALLU; ++i, --right)
   {
-    if(mat->data[y * mat->cols + i] == _BGN)
-      mat->data[y * mat->cols + i] = _KBOOM;
-    else if (mat->data[y * mat->cols + i] == _WALLE)
+    pos = y * mat->cols + i;
+    if(mat->data[pos] == _BGN)
+      mat->data[pos] = _KBOOM;
+    else if (mat->data[pos] == _WALLE)
     {
-      if(rand() % 2 == 0)
-        mat->data[y * mat->cols + i] = _DIE;
-      else
-        mat->data[y * mat->cols + i] = _BGN;
       right = 0;
+      r = rand() % 40;
+      if(r == 0)
+        mat->data[pos] = _DIE;
+      else if(r < 10)
+        mat->data[pos] = _EXT;
+      else
+        mat->data[pos] = _BGN;
     }
-    else if(mat->data[y * mat->cols + i] == _PLAYER || mat->data[y * mat->cols + i] == _PLAYER2)
+    else if(mat->data[pos] == _PLAYER || mat->data[pos] == _PLAYER2)
      isAlive = 0;
   }
 
   for (int j = y + 1; j < (int)mat->lines && down >= 0 && mat->data[j * mat->cols + x] != _WALLU; ++j, --down)
   {
-    if(mat->data[j * mat->cols + x] == _BGN)
-      mat->data[j * mat->cols + x] = _KBOOM;
-    else if (mat->data[j * mat->cols + x] == _WALLE)
+    pos = j * mat->cols + x;
+    if(mat->data[pos] == _BGN)
+      mat->data[pos] = _KBOOM;
+    else if (mat->data[pos] == _WALLE)
     {
       down = 0;
-      if(rand() % 2 == 0)
-        mat->data[j * mat->cols + x] = _DIE;
+      r = rand() % 40;
+      if(r == 0)
+        mat->data[pos] = _DIE;
+      else if(r < 10)
+        mat->data[pos] = _EXT;
       else
-       mat->data[j * mat->cols + x] = _BGN;
+        mat->data[pos] = _BGN; 
     }
-    else if(mat->data[j * mat->cols + x] == _PLAYER || mat->data[j * mat->cols + x] == _PLAYER2)
+    else if(mat->data[pos] == _PLAYER || mat->data[pos] == _PLAYER2)
       isAlive = 0;
   }
 
