@@ -18,6 +18,8 @@ struct vector *vector_make(int capacity);
 
 void vector_push_back(struct vector *vect, struct Tuple *x);
 
+void clearVect(struct vector *vect);
+
 void freeVect(struct vector *vect);
 
 # endif

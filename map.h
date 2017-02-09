@@ -7,7 +7,7 @@
 # define _BGN 8849
 # define _WALLU 13
 # define _WALLE 27
-# define _KBOOM 99
+# define _KBOOM 8899
 # define _EXT 8850
 # define _DIE 8851
 

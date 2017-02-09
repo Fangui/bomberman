@@ -20,6 +20,13 @@ void vector_push_back(struct vector *vect, struct Tuple *x)
   ++(vect->size);
 }
 
+void clearVect(struct vector *vect)
+{
+  for(int i = 0; i < vect->size; ++i)
+    free(vect->data[i]);
+  vect->size = 0;
+}
+
 void freeVect(struct vector *vect)
 {
   for(int i = 0; i < vect->size; ++i)
