@@ -34,18 +34,42 @@ void clear_Bomb(struct matrix *mat)
     } 
 }
 
-void end_Bomb(struct matrix *mat, int lines, int cols)
+void end_Bomb(struct matrix *mat, int lines, int cols, int field)
 {
+  int range = field, pos;
+
   mat->data[lines * mat->cols + cols] = _BGN;
 
-  for(int i = lines - 1; i >= 0 && mat->data[i * mat->cols + cols] == _KBOOM; --i)
-    mat->data[i * mat->cols + cols] = _BGN;
-  for(int j = cols - 1; j >= 0 && mat->data[lines * mat->cols + j] == _KBOOM; --j)
-    mat->data[lines * mat->cols + j] = _BGN;
-  for(int i = lines + 1; i < (int) mat->lines && mat->data[i * mat->cols + cols] == _KBOOM; ++i)
-    mat->data[i * mat->cols + cols] = _BGN;
-  for(int j = cols + 1; j < (int) mat->cols && mat->data[lines * mat->cols + j] == _KBOOM; ++j)
-    mat->data[lines * mat->cols + j] = _BGN;
+  for(int i = lines - 1; i >= 0 && range >= 0; --i, --range)
+  {
+    pos = i * mat->cols + cols;
+    if(mat->data[pos] == _KBOOM) 
+      mat->data[pos] = _BGN;
+  }
+
+  range = field;
+  for(int j = cols - 1; j >= 0 && range >= 0; --j, --range)
+  {
+    pos = lines * mat->cols + j;
+    if(mat->data[pos] == _KBOOM)
+      mat->data[pos] = _BGN;
+  }
+
+  range = field;
+  for(int i = lines + 1; i < (int) mat->lines && range >= 0; ++i, --range)
+  {
+    pos = i * mat->cols + cols;
+    if(mat->data[pos] == _KBOOM)
+      mat->data[pos] = _BGN;
+  }
+
+  range = field;
+  for(int j = cols + 1; j < (int) mat->cols && range >= 0; ++j, -- field, --range)
+  {
+    pos = lines * mat->cols + j;
+    if(mat->data[pos] == _KBOOM)
+      mat->data[pos] = _BGN;
+  }
 }
 
 int kboom(struct matrix *mat, struct player *player, int lines, int cols)
@@ -194,7 +218,7 @@ void game(size_t lines, size_t cols)
           player = player2;
 
         player->isAlive = kboom(mat, player, data->Y, data->X);
-        queue2_push(queue2, data->X, data->Y, data->time + 1);
+        queue2_push(queue2, data->X, data->Y, data->time + 1, player->range);
         --player->nbBomb;
         free(data);
       }
@@ -202,7 +226,7 @@ void game(size_t lines, size_t cols)
       while(queue2->size > 0 && current.tv_sec >= queue2->store->time)
       {
         list2 = queue2_pop(queue2);
-        end_Bomb(mat, list2->Y, list2->X);
+        end_Bomb(mat, list2->Y, list2->X, list2->field);
 
         free(list2);
       }
@@ -223,8 +247,6 @@ void game(size_t lines, size_t cols)
         }
         else
         {
-//          for(int i = 0; i < vect->size; ++i)
-//            end_Bomb(mat, vect->data[i]->t1, vect->data[i]->t2);
           clear_Bomb(mat);
           expl3 = 0;
           generat = 0;

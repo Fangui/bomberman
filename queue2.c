@@ -6,12 +6,13 @@ struct queue2 *queue2_init()
   return queue;
 }
 
-void queue2_push(struct queue2 *queue, size_t X, size_t Y, time_t time)
+void queue2_push(struct queue2 *queue, size_t X, size_t Y, time_t time, int field)
 {
   struct list2 *list = malloc(sizeof(struct list2));
   list->X = X;
   list->Y = Y;
   list->time = time;
+  list->field = field;
   
   if(queue->size == 0)
   {
