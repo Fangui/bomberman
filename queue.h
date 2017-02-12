@@ -7,10 +7,14 @@
 
 # include <unistd.h>
 
-struct list {
-  struct list *next;
+struct data{
   time_t time;
   int pl, X, Y;
+};
+
+struct list {
+  struct list *next;
+  struct data *data;
 };
  
 struct queue {
@@ -22,7 +26,7 @@ struct queue *queue_init();
  
 void queue_push(struct queue *queue, int pl, int X, int Y, time_t time);
 
-struct list *queue_pop(struct queue *queue);
+struct data *queue_pop(struct queue *queue);
  
 void freeQueue(struct queue *queue);
 

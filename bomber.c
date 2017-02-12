@@ -164,7 +164,7 @@ void game(size_t lines, size_t cols)
   struct vector *vect = vector_make(16);
   struct queue *queue = queue_init();
   struct queue2 *queue2 = queue2_init();
-  struct list *list = NULL;
+  struct data *data = NULL;
   struct list2 *list2 = NULL;
   struct player *player = NULL, *player1 = newPlayer(_PLAYER, mat);
   struct player *player2 = newPlayer(_PLAYER2, mat);
@@ -185,18 +185,18 @@ void game(size_t lines, size_t cols)
     {
       clock_gettime(CLOCK_MONOTONIC, &current);
 
-      while(queue->size > 0 && current.tv_sec >= queue->store->time)
+      while(queue->size > 0 && current.tv_sec >= queue->store->data->time)
       {
-        list = queue_pop(queue);
-        if(list->pl == 1)
+        data = queue_pop(queue);
+        if(data->pl == 1)
           player = player1;
         else
           player = player2;
 
-        player->isAlive = kboom(mat, player, list->Y, list->X);
-        queue2_push(queue2, list->X, list->Y, list->time + 1);
+        player->isAlive = kboom(mat, player, data->Y, data->X);
+        queue2_push(queue2, data->X, data->Y, data->time + 1);
         --player->nbBomb;
-        free(list);
+        free(data);
       }
 
       while(queue2->size > 0 && current.tv_sec >= queue2->store->time)
@@ -334,6 +334,8 @@ void game(size_t lines, size_t cols)
     }
     printf("\e[1;1H\e[2J");
   }
+  freeQueue(queue);
+  freeQueue2(queue2);
   freeVect(vect);
   freeMat(mat);
   free(player1);

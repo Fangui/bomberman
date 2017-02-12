@@ -3,7 +3,6 @@
 struct queue2 *queue2_init()
 {
   struct queue2 *queue = calloc(1, sizeof(struct queue2));
-  queue->store = calloc(1, sizeof(struct list2));
   return queue;
 }
 
@@ -52,4 +51,5 @@ void freeQueue2(struct queue2 *queue)
     free(list);
     --queue->size;
   }
+  free(queue);
 }
