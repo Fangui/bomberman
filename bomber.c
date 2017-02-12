@@ -72,6 +72,20 @@ void end_Bomb(struct matrix *mat, int lines, int cols, int field)
   }
 }
 
+void generateBonus(struct matrix *mat, int pos)
+{
+  int r = rand() % 50;
+
+  if(r > 25)
+    mat->data[pos] = _BGN;
+  else if(r > 15)
+    mat->data[pos] = _EXT;
+  else if(r > 8)
+    mat->data[pos] = _ADD;
+  else if(r == 0)
+    mat->data[pos] = _DIE;
+}
+
 int kboom(struct matrix *mat, struct player *player, int lines, int cols)
 {
   int x = cols;
@@ -81,10 +95,13 @@ int kboom(struct matrix *mat, struct player *player, int lines, int cols)
   int up = left;
   int down = up;
   int isAlive = 1;
-  int r, pos;
+  int pos;
 
   if(cols == (int)player->posX && lines == (int)player->posY)
     isAlive = 0;
+
+  if(mat->data[y * mat->cols + x] != _BOMB)
+    return 1;
  
   mat->data[y * mat->cols + x] = _KBOOM;
 
@@ -96,15 +113,7 @@ int kboom(struct matrix *mat, struct player *player, int lines, int cols)
     else if (mat->data[pos] == _WALLE)
     {
       left = 0;
-      r = rand() % 50;
-      if(r > 25)
-        mat->data[pos] = _BGN;
-      else if(r > 15)
-        mat->data[pos] = _EXT;
-      else if(r > 8)
-        mat->data[pos] = _ADD;
-      else if(r == 0)
-        mat->data[pos] = _DIE;
+      generateBonus(mat, pos);
     }
     else if(mat->data[pos] == _PLAYER || mat->data[pos] == _PLAYER2)
      isAlive = 0;
@@ -118,15 +127,7 @@ int kboom(struct matrix *mat, struct player *player, int lines, int cols)
     else if (mat->data[pos] == _WALLE)
     {
       up = 0;
-      r = rand() % 50;
-      if(r > 25)
-        mat->data[pos] = _BGN;
-      else if(r > 15)
-        mat->data[pos] = _EXT;
-      else if(r > 8)
-        mat->data[pos] = _ADD;
-      else if(r == 0)
-        mat->data[pos] = _DIE;
+      generateBonus(mat, pos);
     }
     else if(mat->data[pos] == _PLAYER || mat->data[pos] == _PLAYER2)
      isAlive = 0;
@@ -140,15 +141,7 @@ int kboom(struct matrix *mat, struct player *player, int lines, int cols)
     else if (mat->data[pos] == _WALLE)
     {
       right = 0;
-      r = rand() % 50;
-      if(r > 25) 
-        mat->data[pos] = _BGN;
-      else if(r > 15)
-        mat->data[pos] = _EXT;
-      else if(r > 8)
-        mat->data[pos] = _ADD;
-      else if(r == 0)
-        mat->data[pos] = _DIE;
+      generateBonus(mat, pos);
     }
     else if(mat->data[pos] == _PLAYER || mat->data[pos] == _PLAYER2)
      isAlive = 0;
@@ -162,15 +155,7 @@ int kboom(struct matrix *mat, struct player *player, int lines, int cols)
     else if (mat->data[pos] == _WALLE)
     {
       down = 0;
-      r = rand() % 50;
-      if(r > 25) 
-        mat->data[pos] = _BGN;
-      else if(r > 15)
-        mat->data[pos] = _EXT;
-      else if(r > 8)
-        mat->data[pos] = _ADD;
-      else if(r == 0)
-        mat->data[pos] = _DIE;
+      generateBonus(mat, pos);
     }
     else if(mat->data[pos] == _PLAYER || mat->data[pos] == _PLAYER2)
       isAlive = 0;
