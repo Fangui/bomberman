@@ -112,6 +112,9 @@ void printMat(struct matrix *mat)
         case _EXT:
           printf("E");
           break;
+        case _ADD:
+          printf("A");
+          break;
         case _DIE:
           printf("%sD%s", _KRED, _KWHT);
           break;

@@ -10,6 +10,7 @@
 # define _KBOOM 8899
 # define _EXT 8850
 # define _DIE 8851
+# define _ADD 8852
 
 # define _KRED "\x1B[31m"
 # define _KYLW "\x1B[33m"

@@ -1,16 +1,15 @@
-# include "queue.h"
+# include "queue2.h"
 
-struct queue *queue_init()
+struct queue2 *queue2_init()
 {
-  struct queue *queue = calloc(1, sizeof(struct queue));
-  queue->store = calloc(1, sizeof(struct list));
+  struct queue2 *queue = calloc(1, sizeof(struct queue2));
+  queue->store = calloc(1, sizeof(struct list2));
   return queue;
 }
 
-void queue_push(struct queue *queue, int player, int X, int Y, time_t time)
+void queue2_push(struct queue2 *queue, size_t X, size_t Y, time_t time)
 {
-  struct list *list = malloc(sizeof(struct list));
-  list->pl = player;
+  struct list2 *list = malloc(sizeof(struct list2));
   list->X = X;
   list->Y = Y;
   list->time = time;
@@ -30,22 +29,22 @@ void queue_push(struct queue *queue, int player, int X, int Y, time_t time)
   ++queue->size;
 }
 
-struct list *queue_pop(struct queue *queue)
+struct list2 *queue2_pop(struct queue2 *queue)
 {
   if (queue->size == 0)
     return NULL;
 
   --queue->size;
-  struct list *list = queue->store->next
+  struct list2 *list = queue->store->next;
 
   queue->store->next = queue->store->next->next;
 
   return list;
 }
 
-void freeQueue(struct queue *queue)
+void freeQueue2(struct queue2 *queue)
 {
-  struct list *list = NULL;
+  struct list2 *list = NULL;
   while(queue->size > 0)
   {
     list = queue->store;

@@ -7,15 +7,10 @@
 
 # include <unistd.h>
 
-struct tup
-{
-  struct Tuple *t1;
-  struct timespec t2;
-};
- 
 struct list {
   struct list *next;
-  void        *data;
+  time_t time;
+  int pl, X, Y;
 };
  
 struct queue {
@@ -25,10 +20,10 @@ struct queue {
  
 struct queue *queue_init();
  
-int queue_is_empty(struct queue *queue);
+void queue_push(struct queue *queue, int pl, int X, int Y, time_t time);
+
+struct list *queue_pop(struct queue *queue);
  
-void queue_push(struct queue *queue, void *elm);
- 
-void* queue_pop(struct queue *queue);
- 
+void freeQueue(struct queue *queue);
+
 # endif /* QUEUE_H_ */

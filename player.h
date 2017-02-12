@@ -5,8 +5,8 @@
 
 struct player
 {
-  int isAlive, value, bomb, expl;
-  size_t posX, posY, nbBomb, X, Y, range;
+  int isAlive, value, nbBomb, maxBomb;
+  size_t posX, posY, range;
 };
 
 struct player *newPlayer(int val, struct matrix *mat);

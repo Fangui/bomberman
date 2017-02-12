@@ -1,13 +1,10 @@
-# define _XOPEN_SOURCE 500
-
-# include "vector.h"
+# include "queue2.h"
 
 # include <termios.h>
-# include <unistd.h>
 
 void generate_Bomb(struct matrix *mat, struct vector *vect)
 {
-  struct Tuple *tup;
+  struct Tuple *tup = NULL;
   size_t pos;
   for(size_t i = 0; i < mat->lines; ++i)
     for(size_t j = 0; j < mat->cols; ++j)
@@ -62,7 +59,7 @@ int kboom(struct matrix *mat, struct player *player, int lines, int cols)
   int isAlive = 1;
   int r, pos;
 
-  if(player->X == player->posX && player->Y == player->posY)
+  if(cols == (int)player->posX && lines == (int)player->posY)
     isAlive = 0;
  
   mat->data[y * mat->cols + x] = _KBOOM;
@@ -75,13 +72,15 @@ int kboom(struct matrix *mat, struct player *player, int lines, int cols)
     else if (mat->data[pos] == _WALLE)
     {
       left = 0;
-      r = rand() % 40;
-      if(r == 0)
-        mat->data[pos] = _DIE;
-      else if(r < 10)
-        mat->data[pos] = _EXT;
-      else
+      r = rand() % 50;
+      if(r > 25)
         mat->data[pos] = _BGN;
+      else if(r > 15)
+        mat->data[pos] = _EXT;
+      else if(r > 8)
+        mat->data[pos] = _ADD;
+      else if(r == 0)
+        mat->data[pos] = _DIE;
     }
     else if(mat->data[pos] == _PLAYER || mat->data[pos] == _PLAYER2)
      isAlive = 0;
@@ -95,13 +94,15 @@ int kboom(struct matrix *mat, struct player *player, int lines, int cols)
     else if (mat->data[pos] == _WALLE)
     {
       up = 0;
-      r = rand() % 40;
-      if(r == 0)
-        mat->data[pos] = _DIE;
-      else if(r < 10)
-        mat->data[pos] = _EXT;
-      else
+      r = rand() % 50;
+      if(r > 25)
         mat->data[pos] = _BGN;
+      else if(r > 15)
+        mat->data[pos] = _EXT;
+      else if(r > 8)
+        mat->data[pos] = _ADD;
+      else if(r == 0)
+        mat->data[pos] = _DIE;
     }
     else if(mat->data[pos] == _PLAYER || mat->data[pos] == _PLAYER2)
      isAlive = 0;
@@ -115,13 +116,15 @@ int kboom(struct matrix *mat, struct player *player, int lines, int cols)
     else if (mat->data[pos] == _WALLE)
     {
       right = 0;
-      r = rand() % 40;
-      if(r == 0)
-        mat->data[pos] = _DIE;
-      else if(r < 10)
-        mat->data[pos] = _EXT;
-      else
+      r = rand() % 50;
+      if(r > 25) 
         mat->data[pos] = _BGN;
+      else if(r > 15)
+        mat->data[pos] = _EXT;
+      else if(r > 8)
+        mat->data[pos] = _ADD;
+      else if(r == 0)
+        mat->data[pos] = _DIE;
     }
     else if(mat->data[pos] == _PLAYER || mat->data[pos] == _PLAYER2)
      isAlive = 0;
@@ -135,13 +138,15 @@ int kboom(struct matrix *mat, struct player *player, int lines, int cols)
     else if (mat->data[pos] == _WALLE)
     {
       down = 0;
-      r = rand() % 40;
-      if(r == 0)
-        mat->data[pos] = _DIE;
-      else if(r < 10)
+      r = rand() % 50;
+      if(r > 25) 
+        mat->data[pos] = _BGN;
+      else if(r > 15)
         mat->data[pos] = _EXT;
-      else
-        mat->data[pos] = _BGN; 
+      else if(r > 8)
+        mat->data[pos] = _ADD;
+      else if(r == 0)
+        mat->data[pos] = _DIE;
     }
     else if(mat->data[pos] == _PLAYER || mat->data[pos] == _PLAYER2)
       isAlive = 0;
@@ -153,16 +158,21 @@ int kboom(struct matrix *mat, struct player *player, int lines, int cols)
 void game(size_t lines, size_t cols)
 {
   char c;
-  int prev, pos, valid, generat = 0, expl3 = 0;
-  struct timespec current, end, end2, end3;
+  int prev, pos, valid, X, Y, generat = 0, expl3 = 0;
+  struct timespec current, end, end3;
   struct matrix *mat = newMat(lines, cols);
   struct vector *vect = vector_make(16);
+  struct queue *queue = queue_init();
+  struct queue2 *queue2 = queue2_init();
+  struct list *list = NULL;
+  struct list2 *list2 = NULL;
   struct player *player = NULL, *player1 = newPlayer(_PLAYER, mat);
   struct player *player2 = newPlayer(_PLAYER2, mat);
+  struct termios info;
+
   buildMap(mat);
   randomMap(mat);
 
-  struct termios info;
   tcgetattr(0, &info);
   info.c_lflag &= ~ICANON;
   info.c_cc[VMIN] = 1;
@@ -171,70 +181,58 @@ void game(size_t lines, size_t cols)
   
   while(player1->isAlive && player2->isAlive)
   {
-    if(player1->bomb || player2->bomb || generat)
+    if(queue->size > 0 || queue2->size > 0)
     {
       clock_gettime(CLOCK_MONOTONIC, &current);
-      if(player1->bomb)
+
+      while(queue->size > 0 && current.tv_sec >= queue->store->time)
       {
-        if(current.tv_sec >= end.tv_sec)
-        {
-          if(player1->expl)
-          {
-            end_Bomb(mat, player1->Y, player1->X);
-            player1->expl = 0;
-            player1->bomb = 0;
-          }
-          else
-          {
-            player1->isAlive = kboom(mat, player1, player1->Y, player1->X);
-            clock_gettime(CLOCK_MONOTONIC, &end);
-            end.tv_sec += 1;
-            player1->expl = 1;
-          }
-        }
+        list = queue_pop(queue);
+        if(list->pl == 1)
+          player = player1;
+        else
+          player = player2;
+
+        player->isAlive = kboom(mat, player, list->Y, list->X);
+        queue2_push(queue2, list->X, list->Y, list->time + 1);
+        --player->nbBomb;
+        free(list);
       }
-      if(player2->bomb)
+
+      while(queue2->size > 0 && current.tv_sec >= queue2->store->time)
       {
-        if(current.tv_sec >= end2.tv_sec)
-        {
-          if(player2->expl)
-          {
-            end_Bomb(mat, player2->Y, player2->X);
-            player2->expl = 0;
-            player2->bomb = 0;
-          }
-          else
-          {
-            player2->isAlive = kboom(mat, player2, player2->Y, player2->X);
-            clock_gettime(CLOCK_MONOTONIC, &end2);
-            end2.tv_sec += 1;
-            player2->expl = 1;
-          }
-        }
+        list2 = queue2_pop(queue2);
+        end_Bomb(mat, list2->Y, list2->X);
+
+        free(list2);
       }
-      if(generat)
+    }
+
+    if(generat)
+    {
+      clock_gettime(CLOCK_MONOTONIC, &current);
+      if(current.tv_sec >= end3.tv_sec)
       {
-        if(current.tv_sec >= end3.tv_sec)
+        if(!expl3)
         {
-          if(!expl3)
-          {
-            for(int i = 0; i < vect->size; ++i)
-              player1->isAlive = kboom(mat, player1, vect->data[i]->t1, vect->data[i]->t2);
-            clearVect(vect);
-            end3.tv_sec += 1;
-            expl3 = 1;
-          }
-          else
-          {
-//            for(int i = 0; i < vect->size; ++i)
-//              end_Bomb(mat, vect->data[i]->t1, vect->data[i]->t2);
-            clear_Bomb(mat);
-            expl3 = 0;
-            generat = 0;
-          }
+          for(int i = 0; i < vect->size; ++i)
+            player1->isAlive = kboom(mat, player1, vect->data[i]->t1, vect->data[i]->t2);
+          clearVect(vect);
+          end3.tv_sec += 1;
+          expl3 = 1;
+        }
+        else
+        {
+//          for(int i = 0; i < vect->size; ++i)
+//            end_Bomb(mat, vect->data[i]->t1, vect->data[i]->t2);
+          clear_Bomb(mat);
+          expl3 = 0;
+          generat = 0;
         }
       }
     }
+    
+      
     printMat(mat);
     c = getchar();
     valid = 0;
@@ -302,6 +300,9 @@ void game(size_t lines, size_t cols)
           clock_gettime(CLOCK_MONOTONIC, &end3);
           end3.tv_sec += 3;
         }
+        else if(mat->data[pos] == _ADD)
+          ++player->maxBomb;
+
         if(mat->data[prev] == player->value)
           mat->data[prev] = _BGN;
         mat->data[pos] = player->value;
@@ -310,27 +311,25 @@ void game(size_t lines, size_t cols)
     else if(c == ' ' || c == '5')
     {
       if(c == ' ')
-        player = player1;
-      else
-        player = player2;
-
-      pos = player->posY * mat->cols + player->posX;
-      if(mat->data[pos] != _BOMB && player->bomb == 0)
       {
-        player->X = player->posX;
-        player->Y = player->posY;
+        valid = 1;
+        player = player1;
+      }
+      else
+      {
+        valid = 0;
+        player = player2;
+      }
+      pos = player->posY * mat->cols + player->posX;
+      if(mat->data[pos] != _BOMB && player->nbBomb <= player->maxBomb)
+      {
+        X = player->posX;
+        Y = player->posY;
         mat->data[pos] = _BOMB;
-        player->bomb = 1;
-        if(c == ' ')
-        {
-          clock_gettime(CLOCK_MONOTONIC, &end);
-          end.tv_sec += 3;
-        }
-        else
-        {
-          clock_gettime(CLOCK_MONOTONIC, &end2);
-          end2.tv_sec += 3;
-        }
+        ++player->nbBomb;
+        clock_gettime(CLOCK_MONOTONIC, &end);
+        end.tv_sec += 3;
+        queue_push(queue, valid, X, Y, end.tv_sec);
       }
     }
     printf("\e[1;1H\e[2J");
