@@ -12,7 +12,6 @@ all: bomber
 bomber: ${OBJ}
 
 clean:
-	rm -f *.o
-	rm -f .*.swp
+	rm -f *.o *.d .*.swp
 	rm bomber
 	clear
