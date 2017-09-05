@@ -1,18 +1,17 @@
 CC=gcc
 CPPFLAGS=
-CFLAGS= -Wall -Wextra -std=c99 -O2 -o bomber
+CFLAGS= -Wall -Wextra -std=c99 -O2
 LDFLAGS=
 LDLIBS=
- 
+
 SRC= map.c player.c vector.c queue.c queue2.c
 
-OBJ= ${SRC:.c=.o} 
+OBJ= ${SRC:.c=.o}
 all: bomber
 
-bomber: ${OBJ} 
- 
+bomber: ${OBJ}
+
 clean:
-	rm -f ${OBJ}
 	rm -f *.o
 	rm -f .*.swp
 	rm bomber
