@@ -1,0 +1,25 @@
+Usage ./bomber [LINES][COLS]
+By default lines and cols = 15
+
+Player:
+    Player1:P, move position by pressing z q s d (up left down right),
+    and put bomb with space.
+
+    Player2:S, move position by pressing 8 4 2 6 (up left down right)
+    and put bomb with 5
+
+Bomb:
+    B: explose with a delay of 2s (macro DELAY_BOMB)
+    +: the bomb blast, stay 1s
+
+Bonus:
+
+    D: put many bombs randomly on the map
+
+    E: Extends the range of the explosion of the bomb
+
+    A: Add the max bombs puts in the map
+
+Wall:
+    ": Wall that can be break, can spawn bonus
+    # |: Unbreakable wall

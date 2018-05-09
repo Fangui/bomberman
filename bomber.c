@@ -3,6 +3,8 @@
 # include <fcntl.h>
 # include <termios.h>
 
+#define DELAY_BOMB 2
+
 void generate_Bomb(struct matrix *mat, struct vector *vect)
 {
   struct Tuple *tup = NULL;
@@ -32,7 +34,7 @@ void clear_Bomb(struct matrix *mat)
       pos = i * mat->cols + j;
       if(mat->data[pos] == _KBOOM)
         mat->data[pos] = _BGN;
-    } 
+    }
 }
 
 void end_Bomb(struct matrix *mat, int lines, int cols, int field)
@@ -44,7 +46,7 @@ void end_Bomb(struct matrix *mat, int lines, int cols, int field)
   for(int i = lines - 1; i >= 0 && range >= 0; --i, --range)
   {
     pos = i * mat->cols + cols;
-    if(mat->data[pos] == _KBOOM) 
+    if(mat->data[pos] == _KBOOM)
       mat->data[pos] = _BGN;
   }
 
@@ -103,7 +105,7 @@ int kboom(struct matrix *mat, struct player *player, int lines, int cols)
 
   if(mat->data[y * mat->cols + x] != _BOMB)
     return 1;
- 
+
   mat->data[y * mat->cols + x] = _KBOOM;
 
   for (int i = x - 1; i >= 0 && left >= 0 && mat->data[y * mat->cols + i] != _WALLU; --i, --left)
@@ -191,7 +193,9 @@ void game(size_t lines, size_t cols)
   info.c_cc[VMIN] = 1;
   info.c_cc[VTIME] = 0;
   tcsetattr(0, TCSANOW, &info);
-  
+
+  printMat(mat);
+
   while(player1->isAlive && player2->isAlive)
   {
     need_print = 0;
@@ -203,10 +207,7 @@ void game(size_t lines, size_t cols)
       while(queue->size > 0 && current.tv_sec >= queue->store->data->time)
       {
         data = queue_pop(queue);
-        if(data->pl == 1)
-          player = player1;
-        else
-          player = player2;
+        player = data->pl == 1 ? player1 : player2;
 
         player->isAlive = kboom(mat, player, data->Y, data->X);
         queue2_push(queue2, data->X, data->Y, data->time + 1, player->range);
@@ -245,11 +246,11 @@ void game(size_t lines, size_t cols)
           expl3 = 0;
           generat = 0;
         }
+        need_print = 1;
       }
-      need_print = 1;
     }
-    
-      
+
+
     c = getchar();
     valid = 0;
 
@@ -273,7 +274,7 @@ void game(size_t lines, size_t cols)
       }
       else if( (c == 'z' || c == '8') && player->posY != 0)
       {
-        pos = (player->posY - 1) * mat->cols + player->posX; 
+        pos = (player->posY - 1) * mat->cols + player->posX;
         if(mat->data[pos] >= _BGN)
         {
           --player->posY;
@@ -303,7 +304,7 @@ void game(size_t lines, size_t cols)
         player->isAlive = 0;
         valid = 0;
       }
- 
+
       if(valid)
       {
 
@@ -316,7 +317,7 @@ void game(size_t lines, size_t cols)
           generate_Bomb(mat, vect);
           generat = 1;
           clock_gettime(CLOCK_MONOTONIC, &end3);
-          end3.tv_sec += 3;
+          end3.tv_sec += DELAY_BOMB;
         }
         else if(mat->data[pos] == _ADD)
           ++player->maxBomb;
@@ -347,7 +348,7 @@ void game(size_t lines, size_t cols)
         mat->data[pos] = _BOMB;
         ++player->nbBomb;
         clock_gettime(CLOCK_MONOTONIC, &end);
-        end.tv_sec += 3;
+        end.tv_sec += DELAY_BOMB;
         queue_push(queue, valid, X, Y, end.tv_sec);
       }
     }
@@ -357,6 +358,14 @@ void game(size_t lines, size_t cols)
       printMat(mat);
     }
   }
+
+  if (player1->isAlive)
+    printf("Player 1 win\n");
+  else if (player2->isAlive)
+    printf("Player 2 win\n");
+  else
+    printf("It is a draw\n");
+
   freeQueue(queue);
   freeQueue2(queue2);
   freeVect(vect);
@@ -365,10 +374,20 @@ void game(size_t lines, size_t cols)
   free(player2);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-  size_t lines = 21;
-  game(lines, lines * 2);
+  size_t lines = 15;
+  size_t cols = lines;
+  if (argc >= 2)
+  {
+      printf("%s\n", argv[1]);
+    lines = atoi(argv[1]);
+    if (argc == 3)
+      cols = atoi(argv[2]);
+  }
+  lines = lines > 2 ? lines : 3;
+  cols = cols > 2 ? cols : 3;
+  game(lines, cols);
 
   return 0;
 }

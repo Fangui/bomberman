@@ -26,9 +26,9 @@ void buildMap(struct matrix *mat)
     for (size_t j = 0; j < mat -> cols; ++j)
     {
       n = rand() % 42;
-      if (n <= 11)
+      if (n <= 8)
       { *(mat -> data + (i * mat -> cols + j)) = _WALLU; }
-      else if (n <= 29)
+      else if (n <= 20)
       { *(mat -> data + (i * mat -> cols + j)) = _WALLE; }
       else
       { *(mat -> data + (i * mat -> cols + j)) = _BGN; }
@@ -76,8 +76,8 @@ void randomMap(struct matrix *map)
 void printMat(struct matrix *mat)
 {
   printf(" ");
-  for (size_t i = 0; i < mat -> lines; ++i)
-  { printf("=="); }
+  for (size_t i = 0; i < mat -> cols; ++i)
+  { printf("="); }
 
   for (size_t i = 0; i < mat -> lines; ++i)
   {
@@ -126,7 +126,7 @@ void printMat(struct matrix *mat)
   }
   printf("\n ");
 
-  for (size_t i = 0; i < mat -> lines; ++i)
-  { printf("=="); }
+  for (size_t i = 0; i < mat -> cols; ++i)
+  { printf("="); }
   printf("\n");
 }
