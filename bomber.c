@@ -1,5 +1,6 @@
 # include "queue2.h"
 
+# include <fcntl.h>
 # include <termios.h>
 
 void generate_Bomb(struct matrix *mat, struct vector *vect)
@@ -166,7 +167,10 @@ int kboom(struct matrix *mat, struct player *player, int lines, int cols)
 
 void game(size_t lines, size_t cols)
 {
+
+  fcntl(0, F_SETFL, fcntl(0, F_GETFL) | O_NONBLOCK);
   char c;
+  char need_print;
   int prev, pos, valid, X, Y, generat = 0, expl3 = 0;
   struct timespec current, end, end3;
   struct matrix *mat = newMat(lines, cols);
@@ -190,6 +194,8 @@ void game(size_t lines, size_t cols)
   
   while(player1->isAlive && player2->isAlive)
   {
+    need_print = 0;
+    c = '\0';
     if(queue->size > 0 || queue2->size > 0)
     {
       clock_gettime(CLOCK_MONOTONIC, &current);
@@ -205,7 +211,9 @@ void game(size_t lines, size_t cols)
         player->isAlive = kboom(mat, player, data->Y, data->X);
         queue2_push(queue2, data->X, data->Y, data->time + 1, player->range);
         --player->nbBomb;
+
         free(data);
+        need_print = 1;
       }
 
       while(queue2->size > 0 && current.tv_sec >= queue2->store->time)
@@ -214,6 +222,7 @@ void game(size_t lines, size_t cols)
         end_Bomb(mat, list2->Y, list2->X, list2->field);
 
         free(list2);
+        need_print = 1;
       }
     }
 
@@ -237,10 +246,10 @@ void game(size_t lines, size_t cols)
           generat = 0;
         }
       }
+      need_print = 1;
     }
     
       
-    printMat(mat);
     c = getchar();
     valid = 0;
 
@@ -297,6 +306,8 @@ void game(size_t lines, size_t cols)
  
       if(valid)
       {
+
+        need_print = 1;
         pos = player->posY * mat->cols + player->posX;
         if(mat->data[pos] == _EXT)
           ++player->range;
@@ -330,6 +341,7 @@ void game(size_t lines, size_t cols)
       pos = player->posY * mat->cols + player->posX;
       if(mat->data[pos] != _BOMB && player->nbBomb <= player->maxBomb)
       {
+        need_print = 1;
         X = player->posX;
         Y = player->posY;
         mat->data[pos] = _BOMB;
@@ -339,7 +351,11 @@ void game(size_t lines, size_t cols)
         queue_push(queue, valid, X, Y, end.tv_sec);
       }
     }
-    printf("\e[1;1H\e[2J");
+    if (need_print)
+    {
+      printf("\e[1;1H\e[2J");
+      printMat(mat);
+    }
   }
   freeQueue(queue);
   freeQueue2(queue2);
